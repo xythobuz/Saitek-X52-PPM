@@ -17,6 +17,9 @@
 #include "hid_parser.h"
 #include "x52.h"
 
+#define ENABLE_SERIAL_PORT
+#define DEBUG_OUTPUT
+
 USB usb;
 USBHub hub(&usb);
 HIDUniversal hid(&usb);
@@ -24,12 +27,19 @@ X52 x52(&usb, &hid);
 JoystickEvents joyevents;
 JoystickReportParser joy(&joyevents);
 
-void setup() {  
+void setup() {
+#ifdef ENABLE_SERIAL_PORT
     Serial.begin(115200);
+#endif
+
+#ifdef DEBUG_OUTPUT
     Serial.println("Start");
+#endif
 
     if (usb.Init() == -1) {
+#ifdef DEBUG_OUTPUT
         Serial.println("OSC did not start.");
+#endif
     }
 
     delay(200);
@@ -39,20 +49,30 @@ void setup() {
     }
 }
 
+void init_joystick() {
+    x52.setLEDBrightness(2);
+    x52.setMFDBrightness(2);
+    x52.setShift(0);
+    x52.setBlink(0);
+    x52.setMFDText(0, "Arduino X52 Host");
+    x52.setMFDText(1, "    has been    ");
+    x52.setMFDText(2, "  initialized!  ");
+}
+
 void loop() {
     usb.Task();
 
     static unsigned long lastTime = 0;
-    static uint8_t d = 0;
-    if ((millis() - lastTime) >= 500) {
-        //x52.setDate(d, d, d);
-        d++;
+    static uint8_t initialized = 0;
+    if ((millis() - lastTime) >= 1000) {
         lastTime = millis();
-
-        String tmp = String(d);
-        //x52.setMFDText(0, tmp.c_str());
+        if (!initialized) {
+            init_joystick();
+            initialized = 1;
+        }
     }
 
+#ifdef DEBUG_OUTPUT
     if (Serial.available()) {
         char c = Serial.read();
         if (c == 't') {
@@ -89,5 +109,6 @@ void loop() {
             Serial.println("Unknown command!");
         }
     }
+#endif
 }
 

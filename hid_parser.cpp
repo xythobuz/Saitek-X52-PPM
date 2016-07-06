@@ -12,14 +12,17 @@
 
 #include "hid_parser.h"
 
+//#define DEBUG_OUTPUT
+
 JoystickReportParser::JoystickReportParser(JoystickEvents* evt)
-        : joyEvents(evt), oldHat(0), oldButtons(0), oldMouse(0) {
+        : joyEvents(evt), oldHat(0), oldButtons(0), oldMouse(0), buffer(0) {
     for (uint8_t i = 0; i < RPT_GEMEPAD_LEN; i++) {
         oldPad[i] = 0;
     }
 }
 
 void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t* bufPart) {
+    // Ugly hack for too small packet size in USB Host library...
     if (len == 8) {
         // First part of buffer, store and do nothing
         for (uint8_t i = 0; i < 8; i++) {
@@ -33,7 +36,8 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
         }
     }
 
-    /*
+    // Dump whole USB HID packet for debugging purposes
+#ifdef DEBUG_OUTPUT
     Serial.println("");
     Serial.print("Packet: ");
     for (uint8_t i = 0; i < (8 + len); i++) {
@@ -42,7 +46,7 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
     }
     Serial.println("");
     Serial.println("");
-    */
+#endif
 
     // Checking if there are changes in report since the method was last called
     bool match = true;
@@ -70,7 +74,7 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
         }
     }
 
-    // Calling Hat Switch event handler`
+    // Calling Hat Switch event handler
     uint8_t hat = (buf[12] & 0xF0) >> 4;
     if (hat != oldHat && joyEvents) {
         joyEvents->OnHatSwitch(hat);
@@ -103,6 +107,7 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
         oldButtons = buttons;
     }
 
+    // Calling Mouse Event Handler if state has changed
     if (oldMouse != buf[13] && joyEvents) {
         oldMouse = buf[13];
         joyEvents->OnMouseMoved((buf[13] & 0xF0) >> 4, buf[13] & 0x0F);

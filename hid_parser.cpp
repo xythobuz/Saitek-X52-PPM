@@ -1,10 +1,10 @@
 /*
  * Saitek X52 Arduino USB Host Shield Library.
  * Copyright 2016 by Thomas Buck <xythobuz@xythobuz.de>
- * 
+ *
  * Based on the USB Host Library HID Joystick example
  * https://www.circuitsathome.com/mcu/hid-joystick-code-sample
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, version 2.
@@ -36,8 +36,8 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
         }
     }
 
-    // Dump whole USB HID packet for debugging purposes
 #ifdef DEBUG_OUTPUT
+    // Dump whole USB HID packet for debugging purposes
     Serial.println("");
     Serial.print("Packet: ");
     for (uint8_t i = 0; i < (8 + len); i++) {
@@ -67,7 +67,7 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
         buffer.Ry = buf[6];
         buffer.Slider = buf[7];
 
-        joyEvents->OnGamePadChanged((const GamePadEventData*)&buffer);
+        joyEvents->OnGamePadChanged(buffer);
 
         for (uint8_t i = 0; i < RPT_GEMEPAD_LEN; i++) {
             oldPad[i] = buf[i];

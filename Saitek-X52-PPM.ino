@@ -24,7 +24,7 @@ USB usb;
 USBHub hub(&usb);
 HIDUniversal hid(&usb);
 X52 x52(&usb, &hid);
-JoystickEvents joyevents;
+JoystickEventsDeadZone joyevents;
 JoystickReportParser joy(&joyevents);
 
 void setup() {

@@ -140,6 +140,13 @@ void X52::setMFDText(uint8_t line, const char* text) {
 }
 
 uint8_t X52::sendCommand(uint16_t command, uint16_t val) {
+    if ((!usb) || (!hid)) {
+#ifdef DEBUG_OUTPUT
+        Serial.println("Invalid objects!");
+#endif
+        return 42;
+    }
+
     const uint8_t valLo = (val & 0x00FF);
     const uint8_t valHi = (val & 0xFF00) >> 8;
 

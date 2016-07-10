@@ -14,12 +14,9 @@
 #include "cppm.h"
 #include "events.h"
 
-//#define DEBUG_OUTPUT_RAW
-#define DEBUG_OUTPUT
-
-#define CHANNEL_THROTTLE 0
-#define CHANNEL_PITCH 2
-#define CHANNEL_ROLL 1
+#define CHANNEL_THROTTLE 2
+#define CHANNEL_PITCH 1
+#define CHANNEL_ROLL 0
 #define CHANNEL_YAW 3
 #define CHANNEL_AUX1 4
 #define CHANNEL_AUX2 5
@@ -31,8 +28,7 @@ JoystickEventsCPPM::JoystickEventsCPPM(JoystickEvents* client) : JoystickEvents(
 
     values[CHANNEL_AUX1] = 200;
     values[CHANNEL_AUX2] = 200;
-    
-    cppmInit();
+
     cppmCopy(values);
 }
 
@@ -41,6 +37,8 @@ void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
     values[CHANNEL_PITCH] = evt.Y;
     values[CHANNEL_ROLL] = evt.X;
     values[CHANNEL_YAW] = evt.Rz;
+    values[CHANNEL_AUX1] = evt.Ry;
+    values[CHANNEL_AUX2] = evt.Slider;
 
     cppmCopy(values);
 }

@@ -17,6 +17,7 @@
 #include "events.h"
 #include "parser.h"
 #include "x52.h"
+#include "cppm.h"
 
 #define ENABLE_SERIAL_PORT
 #define DEBUG_OUTPUT
@@ -44,11 +45,11 @@ void setup() {
 #endif
     }
 
-    delay(200);
-
     if (!hid.SetReportParser(0, &joy)) {
         ErrorMessage<uint8_t >(PSTR("SetReportParser"), 1);
     }
+
+    cppmInit();
 }
 
 void init_joystick() {

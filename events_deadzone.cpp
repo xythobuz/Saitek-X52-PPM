@@ -16,20 +16,23 @@
 #include "events.h"
 
 //#define DEBUG_OUTPUT_RAW
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 
+// X, Y, Z, Rx, Ry, Rz, Slider
+// As you can see, my controller Rz axis is broken,
+// yours may be different, so change these values!
 const GamePadEventData JoystickEventsDeadZone::deadZone(
-    0, 0, 0, 0, 0, 50, 0
+    4, 20, 2, 2, 5, 200, 2
 );
-const uint8_t JoystickEventsDeadZone::deadZoneMouseX = 0;
-const uint8_t JoystickEventsDeadZone::deadZoneMouseY = 0;
+const uint8_t JoystickEventsDeadZone::deadZoneMouseX = 1;
+const uint8_t JoystickEventsDeadZone::deadZoneMouseY = 1;
 
+// X, Y, Z, Rx, Ry, Rz, Slider
 const GamePadEventData JoystickEventsDeadZone::centerValue(
-    0x3FF, 0x3FF, 0x7F,
-    0x7F, 0x7F, 0x1FF, 0x7F
+    0x3FF, 0x3FF, 0x7F, 0x7F, 0x7F, 0x1FF, 0x7F
 );
-const uint8_t JoystickEventsDeadZone::centerMouseX = 0x7F;
-const uint8_t JoystickEventsDeadZone::centerMouseY = 0x7F;
+const uint8_t JoystickEventsDeadZone::centerMouseX = 0x07;
+const uint8_t JoystickEventsDeadZone::centerMouseY = 0x07;
 
 void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
 #ifdef DEBUG_OUTPUT_RAW

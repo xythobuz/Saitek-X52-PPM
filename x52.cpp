@@ -12,8 +12,9 @@
 
 #include "x52.h"
 
+//#define DEBUG_OUTPUT
+
 #define TIME_24H_FORMAT
-#define DEBUG_OUTPUT
 
 X52::X52(USB* u, HID* h) : usb(u), hid(h) { }
 

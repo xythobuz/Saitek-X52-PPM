@@ -31,6 +31,9 @@
 #include <TimerOne.h>
 #include "cppm.h"
 
+//#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT_ALL
+
 #define CHANNELS 8
 #define MAX_STATES ((2 * CHANNELS) + 1)
 #define WHOLE_PULSE_WIDTH 20000
@@ -50,16 +53,23 @@ static void triggerIn(uint16_t us);
 static void nextState(void);
 
 void cppmInit(void) {
+#ifdef DEBUG_OUTPUT
+    Serial.println("Initializing Timer...");
+#endif
+
     pinMode(CPPM_OUTPUT_PIN, OUTPUT);
     digitalWrite(CPPM_OUTPUT_PIN, LOW);
-    Timer1.initialize();
+    Timer1.initialize(PULSE_LOW);
     Timer1.attachInterrupt(&nextState);
     state = 0;
     delaySum = MIN_WAIT;
-    triggerIn(PULSE_LOW);
 }
 
 void cppmCopy(uint16_t *data) {
+#ifdef DEBUG_OUTPUT
+    Serial.println("New CPPM data!");
+#endif
+
     cli();
     for (int i = 0; i < CHANNELS; i++) {
         cppmData[i] = data[i];
@@ -69,18 +79,23 @@ void cppmCopy(uint16_t *data) {
 
 static void triggerIn(uint16_t us) {
     Timer1.setPeriod(us);
-    // TODO reset timer?
+    //Timer1.start();
 }
 
 static void nextState(void) {
-    // TODO stop timer?
+    //Timer1.stop();
+
+#ifdef DEBUG_OUTPUT_ALL
+    Serial.print("CPPM state ");
+    Serial.println(state, DEC);
+#endif
     
     state++;
     if (state > MAX_STATES) {
         state = 0;
         delaySum = MIN_WAIT;
     }
-    if ((state % 2) == 0) {
+    if (!(state & 0x01)) {
         // pulse pause
         digitalWrite(CPPM_OUTPUT_PIN, LOW);
         triggerIn(PULSE_LOW);
@@ -88,7 +103,7 @@ static void nextState(void) {
         digitalWrite(CPPM_OUTPUT_PIN, HIGH);
         if (state <= 15) {
             // normal ppm pulse
-            uint8_t index = state / 2;
+            uint8_t index = state >> 1;
             triggerIn(cppmData[index]);
             delaySum += PULSE_WIDTH - cppmData[index];
         } else {

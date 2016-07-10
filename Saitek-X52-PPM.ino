@@ -19,8 +19,9 @@
 #include "x52.h"
 #include "cppm.h"
 
-#define ENABLE_SERIAL_PORT
-#define DEBUG_OUTPUT
+//#define ENABLE_SERIAL_PORT
+//#define DEBUG_OUTPUT
+//#define DEBUG_INPUT
 
 USB usb;
 USBHub hub(&usb);
@@ -53,13 +54,13 @@ void setup() {
 }
 
 void init_joystick() {
+    x52.initialize();
     x52.setLEDBrightness(2);
     x52.setMFDBrightness(2);
     x52.setShift(0);
     x52.setBlink(0);
     x52.setMFDText(0, "Arduino X52 Host");
-    x52.setMFDText(1, "    has been    ");
-    x52.setMFDText(2, "  initialized!  ");
+    x52.setMFDText(1, "  initialized!");
 }
 
 void loop() {
@@ -73,9 +74,12 @@ void loop() {
             init_joystick();
             initialized = 1;
         }
+
+        String text = "Uptime: " + String(millis() / 1000) + "s";
+        x52.setMFDText(2, text.c_str());
     }
 
-#ifdef DEBUG_OUTPUT
+#ifdef DEBUG_INPUT
     if (Serial.available()) {
         char c = Serial.read();
         if (c == 't') {

@@ -16,7 +16,43 @@
 
 #define TIME_24H_FORMAT
 
-X52::X52(USB* u, HID* h) : usb(u), hid(h) { }
+X52::X52(USB* u, HID* h) : usb(u), hid(h), ready(0) { }
+
+void X52::initialize() {
+    ready = 0;
+    
+    if ((!usb) || (!hid)) {
+        return;
+    }
+
+    uint8_t buf[sizeof (USB_DEVICE_DESCRIPTOR)];
+    USB_DEVICE_DESCRIPTOR* udd = reinterpret_cast<USB_DEVICE_DESCRIPTOR*>(buf);
+    uint8_t ret = usb->getDevDescr(hid->GetAddress(), 0, sizeof(USB_DEVICE_DESCRIPTOR), (uint8_t*)buf);
+    if (ret) {
+#ifdef DEBUG_OUTPUT
+        Serial.print("Error getting descriptor: ");
+        Serial.println(ret, DEC);
+#endif
+    }
+
+    uint16_t vid = udd->idVendor;
+    uint16_t pid = udd->idProduct;
+
+#ifdef DEBUG_OUTPUT
+        Serial.print("VID: ");
+        Serial.print(vid, DEC);
+        Serial.print(" PID: ");
+        Serial.println(pid, DEC);
+#endif
+
+    if ((vid == 1699) && (pid == 597)) {
+        ready = 1;
+    } else {
+#ifdef DEBUG_OUTPUT
+        Serial.println("No valid VID/PID found!");
+#endif
+    }
+}
 
 void X52::setTime(uint8_t h, uint8_t m) {
     uint8_t ret = sendCommand(X52_TIME_CLOCK1, m | ((h & 0x7F) << 8)
@@ -141,6 +177,13 @@ void X52::setMFDText(uint8_t line, const char* text) {
 }
 
 uint8_t X52::sendCommand(uint16_t command, uint16_t val) {
+    if (!ready) {
+#ifdef DEBUG_OUTPUT
+        Serial.println("Invalid state!");
+#endif
+        return 23;
+    }
+    
     if ((!usb) || (!hid)) {
 #ifdef DEBUG_OUTPUT
         Serial.println("Invalid objects!");

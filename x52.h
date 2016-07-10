@@ -40,6 +40,11 @@ class X52 {
     X52(USB* u, HID* h);
 
     /*
+     * Check if a valid PID/VID device has been found.
+     */
+    void initialize();
+
+    /*
      * Set brightness of LEDs and MFD backlight.
      * Three states, 0=off, 1=dim, 2=on.
      */
@@ -80,6 +85,7 @@ class X52 {
     
     USB* usb;
     HID* hid;
+    uint8_t ready;
 };
 
 #endif // __X52_H__

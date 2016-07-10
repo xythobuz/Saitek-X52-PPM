@@ -1,26 +1,9 @@
 /*
  * Combined-PPM signal generator
  *
- * The whole CPPM pulse should be 20ms long.
- * It contains 8 channels with 2ms each, followed
- * by 4ms of silence. One channel pulse varies between
- * 1 and 2 ms. They are seperated with a very short low
- * pulse of about 0.1ms.
- *
- * 20.000us
- *   - 8 * 2.000us = 16.000us
- *   - 9 * 100us = 900us
- *   = 3.100us
- *
- *     1     2     3     4     5     6     7     8
- *    ___   ___   ___   ___   ___   ___   ___   ___   __________
- * | |   | |   | |   | |   | |   | |   | |   | |   | |          |
- * | |   | |   | |   | |   | |   | |   | |   | |   | |          |
- * | |   | |   | |   | |   | |   | |   | |   | |   | |          |
- * |_|   |_|   |_|   |_|   |_|   |_|   |_|   |_|   |_|          |
- *
- * States:
- *  0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16    17
+ * Based on the code from:
+ * https://quadmeup.com/generate-ppm-signal-with-arduino/
+ * https://github.com/DzikuVx/ppm_encoder/blob/master/ppm_encoder_source.ino
  *
  * Copyright 2016 by Thomas Buck <xythobuz@xythobuz.de>
  *
@@ -28,41 +11,42 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, version 2.
  */
-#include <TimerOne.h>
+#include <Arduino.h>
 #include "cppm.h"
 
 //#define DEBUG_OUTPUT
-//#define DEBUG_OUTPUT_ALL
 
-#define CHANNELS 8
-#define MAX_STATES ((2 * CHANNELS) + 1)
-#define WHOLE_PULSE_WIDTH 20000
-#define PULSE_WIDTH 2000
-#define MAX_PULSE_WIDTH (CHANNELS * PULSE_WIDTH) // 16.000
-#define PULSE_LOW 100
-#define PULSE_LOW_SUM ((CHANNELS + 1) * PULSE_LOW) // 900
-#define MIN_WAIT (WHOLE_PULSE_WIDTH - MAX_PULSE_WIDTH - PULSE_LOW_SUM) // 3100
-#define TIME_AFTER_OVERFLOW 128
-#define TIME_MULTIPLIER 2
+#define CHANNELS 8 // set the number of chanels
+#define CHANNEL_DEFAULT_VALUE 1500 // set the default servo value
+#define FRAME_LENGTH 20000 // set the PPM frame length in microseconds (1ms = 1000µs)
+#define PULSE_LENGTH 100 // set the pulse length
+#define ON_STATE 1 // set polarity of the pulses: 1 is positive, 0 is negative
 
-volatile uint16_t cppmData[CHANNELS] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };
-volatile uint16_t delaySum = 0;
-volatile uint8_t state = 0;
-
-static void triggerIn(uint16_t us);
-static void nextState(void);
+static volatile uint16_t cppmData[CHANNELS];
+static volatile uint8_t state = 1;
+static volatile uint8_t currentChannel = CHANNELS;
+static volatile uint16_t calcRest = 0;
 
 void cppmInit(void) {
 #ifdef DEBUG_OUTPUT
     Serial.println("Initializing Timer...");
 #endif
 
+    for (uint8_t i = 0; i < CHANNELS; i++) {
+        cppmData[i] = CHANNEL_DEFAULT_VALUE;
+    }
+
     pinMode(CPPM_OUTPUT_PIN, OUTPUT);
-    digitalWrite(CPPM_OUTPUT_PIN, LOW);
-    Timer1.initialize(PULSE_LOW);
-    Timer1.attachInterrupt(&nextState);
-    state = 0;
-    delaySum = MIN_WAIT;
+    digitalWrite(CPPM_OUTPUT_PIN, ON_STATE ? LOW : HIGH);
+
+    cli();
+    TCCR1A = 0; // set entire TCCR1 register to 0
+    TCCR1B = 0;
+    OCR1A = 100; // compare match register
+    TCCR1B |= (1 << WGM12); // turn on CTC mode
+    TCCR1B |= (1 << CS11); // 8 prescaler: 0,5 microseconds at 16mhz
+    TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
+    sei();
 }
 
 void cppmCopy(uint16_t *data) {
@@ -77,38 +61,26 @@ void cppmCopy(uint16_t *data) {
     sei();
 }
 
-static void triggerIn(uint16_t us) {
-    Timer1.setPeriod(us);
-    //Timer1.start();
-}
-
-static void nextState(void) {
-    //Timer1.stop();
-
-#ifdef DEBUG_OUTPUT_ALL
-    Serial.print("CPPM state ");
-    Serial.println(state, DEC);
-#endif
-    
-    state++;
-    if (state > MAX_STATES) {
+ISR(TIMER1_COMPA_vect){
+    TCNT1 = 0;
+    if (state) {
+        // start pulse
+        digitalWrite(CPPM_OUTPUT_PIN, ON_STATE ? HIGH : LOW);
+        OCR1A = PULSE_LENGTH << 1;
         state = 0;
-        delaySum = MIN_WAIT;
-    }
-    if (!(state & 0x01)) {
-        // pulse pause
-        digitalWrite(CPPM_OUTPUT_PIN, LOW);
-        triggerIn(PULSE_LOW);
     } else {
-        digitalWrite(CPPM_OUTPUT_PIN, HIGH);
-        if (state <= 15) {
-            // normal ppm pulse
-            uint8_t index = state >> 1;
-            triggerIn(cppmData[index]);
-            delaySum += PULSE_WIDTH - cppmData[index];
+        // end pulse and calculate when to start the next pulse
+        digitalWrite(CPPM_OUTPUT_PIN, ON_STATE ? LOW : HIGH);
+        state = 1;
+        if (currentChannel >= CHANNELS) {
+            currentChannel = 0;
+            calcRest += PULSE_LENGTH;
+            OCR1A = (FRAME_LENGTH - calcRest) << 1;
+            calcRest = 0;
         } else {
-            // sync pulse
-            triggerIn(delaySum);
+            OCR1A = (cppmData[currentChannel] - PULSE_LENGTH) << 1;
+            calcRest += cppmData[currentChannel];
+            currentChannel++;
         }
     }
 }

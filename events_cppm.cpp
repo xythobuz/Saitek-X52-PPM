@@ -10,6 +10,7 @@
  * published by the Free Software Foundation, version 2.
  */
 
+#include <Arduino.h>
 #include "data.h"
 #include "cppm.h"
 #include "events.h"
@@ -26,19 +27,19 @@ JoystickEventsCPPM::JoystickEventsCPPM(JoystickEvents* client) : JoystickEvents(
         values[i] = 1500;
     }
 
-    values[CHANNEL_AUX1] = 200;
-    values[CHANNEL_AUX2] = 200;
+    values[CHANNEL_AUX1] = 1000;
+    values[CHANNEL_AUX2] = 1000;
 
     cppmCopy(values);
 }
 
 void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
-    values[CHANNEL_THROTTLE] = evt.Z;
-    values[CHANNEL_PITCH] = evt.Y;
-    values[CHANNEL_ROLL] = evt.X;
-    values[CHANNEL_YAW] = evt.Rz;
-    values[CHANNEL_AUX1] = evt.Ry;
-    values[CHANNEL_AUX2] = evt.Slider;
+    values[CHANNEL_THROTTLE] = map(evt.Z, 0, 0xFF, 1000, 2000);
+    values[CHANNEL_PITCH] = map(evt.Y, 0, 0x7FF, 1000, 2000);
+    values[CHANNEL_ROLL] = map(evt.X, 0, 0x7FF, 1000, 2000);
+    values[CHANNEL_YAW] = map(evt.Rz, 0, 0x3FF, 1000, 2000);
+    values[CHANNEL_AUX1] = map(evt.Ry, 0, 0xFF, 1000, 2000);
+    values[CHANNEL_AUX2] = map(evt.Slider, 0, 0xFF, 1000, 2000);
 
     cppmCopy(values);
 }

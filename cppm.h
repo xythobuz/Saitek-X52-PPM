@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-#define CPPM_OUTPUT_PIN 13
+#define CPPM_OUTPUT_PIN 4
 
 void cppmInit(void);
 void cppmCopy(uint16_t *data);

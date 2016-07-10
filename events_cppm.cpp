@@ -42,21 +42,33 @@ void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
     values[CHANNEL_AUX2] = map(evt.Slider, 0, 0xFF, 1000, 2000);
 
     cppmCopy(values);
+
+    if (client) {
+        client->OnGamePadChanged(evt);
+    }
 }
 
 void JoystickEventsCPPM::OnHatSwitch(uint8_t hat) {
-
+    if (client) {
+        client->OnHatSwitch(hat);
+    }
 }
 
 void JoystickEventsCPPM::OnButtonUp(uint8_t but_id) {
-
+    if (client) {
+        client->OnButtonUp(but_id);
+    }
 }
 
 void JoystickEventsCPPM::OnButtonDn(uint8_t but_id) {
-
+    if (client) {
+        client->OnButtonDn(but_id);
+    }
 }
 
 void JoystickEventsCPPM::OnMouseMoved(uint8_t x, uint8_t y) {
-
+    if (client) {
+        client->OnMouseMoved(x, y);
+    }
 }
 

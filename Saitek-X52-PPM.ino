@@ -28,7 +28,8 @@ USBHub hub(&usb);
 HIDUniversal hid(&usb);
 X52 x52(&usb, &hid);
 JoystickEventsCPPM joyCPPM;
-JoystickEventsDeadZone joyevents((JoystickEvents*)&joyCPPM);
+JoystickEventsButtons joyButtons(&x52, (JoystickEvents*)&joyCPPM);
+JoystickEventsDeadZone joyevents((JoystickEvents*)&joyButtons);
 JoystickReportParser joy(&joyevents);
 
 void setup() {
@@ -55,12 +56,9 @@ void setup() {
 
 void init_joystick() {
     x52.initialize();
-    x52.setLEDBrightness(2);
-    x52.setMFDBrightness(2);
-    x52.setShift(0);
-    x52.setBlink(0);
     x52.setMFDText(0, "Arduino X52 Host");
-    x52.setMFDText(1, "  initialized!");
+    x52.setMFDText(1, "  initialized!  ");
+    x52.setMFDText(2, "                ");
 }
 
 void loop() {

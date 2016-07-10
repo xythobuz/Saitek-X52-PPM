@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 class GamePadEventData;
+class X52;
 
 class JoystickEvents {
   public:
@@ -59,6 +60,19 @@ class JoystickEventsCPPM : public JoystickEvents {
   private:
     const static uint8_t channels = 8;
     uint16_t values[channels];
+};
+
+class JoystickEventsButtons : public JoystickEvents {
+  public:
+    JoystickEventsButtons(X52* x = 0, JoystickEvents* client = 0);
+    virtual void OnGamePadChanged(const GamePadEventData& evt);
+    virtual void OnHatSwitch(uint8_t hat);
+    virtual void OnButtonUp(uint8_t but_id);
+    virtual void OnButtonDn(uint8_t but_id);
+    virtual void OnMouseMoved(uint8_t x, uint8_t y);
+
+  private:
+    X52* x52;
 };
 
 #endif // __JOYSTICK_EVENTS_H__

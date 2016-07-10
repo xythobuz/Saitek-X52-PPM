@@ -10,7 +10,10 @@
  * published by the Free Software Foundation, version 2.
  */
 
-#include "hid_parser.h"
+#include <usb.h>
+
+#include "data.h"
+#include "events.h"
 
 //#define DEBUG_OUTPUT_RAW
 #define DEBUG_OUTPUT

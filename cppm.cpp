@@ -28,14 +28,11 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, version 2.
  */
-
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
+#include <TimerOne.h>
 #include "cppm.h"
 
-#define MAX_STATES 17
 #define CHANNELS 8
+#define MAX_STATES ((2 * CHANNELS) + 1)
 #define WHOLE_PULSE_WIDTH 20000
 #define PULSE_WIDTH 2000
 #define MAX_PULSE_WIDTH (CHANNELS * PULSE_WIDTH) // 16.000
@@ -48,32 +45,15 @@
 volatile uint16_t cppmData[CHANNELS] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };
 volatile uint16_t delaySum = 0;
 volatile uint8_t state = 0;
-volatile uint16_t triggerTimeRemaining = 0;
-
-#define NONE 0
-#define COMPARE_MATCH 1
-#define OVERFLOW 2
-volatile uint8_t triggerState = NONE;
 
 static void triggerIn(uint16_t us);
 static void nextState(void);
 
 void cppmInit(void) {
-    // Set pin to output mode
-    CPPM_DDR |= (1 << CPPM_PIN);
-
-    // Start with a low pulse
-    CPPM_PORT &= ~(1 << CPPM_PIN);
-
-    TCCR0B |= (1 << CS01); // Prescaler: 8
-
-#ifdef DEBUG
-    TIMSK0 |= (1 << TOIE0) | (1 << OCIE0A); // Enable Overflow and Compare Match Interrupt
-#else
-    TIMSK |= (1 << TOIE0) | (1 << OCIE0A); // Enable Overflow and Compare Match Interrupt
-#endif
-    OCR0A = 0;
-
+    pinMode(CPPM_OUTPUT_PIN, OUTPUT);
+    digitalWrite(CPPM_OUTPUT_PIN, LOW);
+    Timer1.initialize();
+    Timer1.attachInterrupt(&nextState);
     state = 0;
     delaySum = MIN_WAIT;
     triggerIn(PULSE_LOW);
@@ -88,17 +68,13 @@ void cppmCopy(uint16_t *data) {
 }
 
 static void triggerIn(uint16_t us) {
-    TCNT0 = 0; // Reset Timer
-    if (us <= (TIME_AFTER_OVERFLOW - 1)) {
-        triggerState = COMPARE_MATCH;
-        OCR0A = us * TIME_MULTIPLIER;
-    } else {
-        triggerState = OVERFLOW;
-        triggerTimeRemaining = us - TIME_AFTER_OVERFLOW;
-    }
+    Timer1.setPeriod(us);
+    // TODO reset timer?
 }
 
 static void nextState(void) {
+    // TODO stop timer?
+    
     state++;
     if (state > MAX_STATES) {
         state = 0;
@@ -106,10 +82,10 @@ static void nextState(void) {
     }
     if ((state % 2) == 0) {
         // pulse pause
-        CPPM_PORT &= ~(1 << CPPM_PIN);
+        digitalWrite(CPPM_OUTPUT_PIN, LOW);
         triggerIn(PULSE_LOW);
     } else {
-        CPPM_PORT |= (1 << CPPM_PIN);
+        digitalWrite(CPPM_OUTPUT_PIN, HIGH);
         if (state <= 15) {
             // normal ppm pulse
             uint8_t index = state / 2;
@@ -119,32 +95,6 @@ static void nextState(void) {
             // sync pulse
             triggerIn(delaySum);
         }
-    }
-}
-
-#ifdef DEBUG
-ISR(TIMER0_OVF_vect) {
-#else
-ISR(TIM0_OVF_vect) {
-#endif
-    if (triggerState == OVERFLOW) {
-        if (triggerTimeRemaining == 0) {
-            triggerState = NONE;
-            nextState();
-        } else {
-            triggerIn(triggerTimeRemaining);
-        }
-    }
-}
-
-#ifdef DEBUG
-ISR(TIMER0_COMPA_vect) {
-#else
-ISR(TIM0_COMPA_vect) {
-#endif
-    if (triggerState == COMPARE_MATCH) {
-        triggerState = NONE;
-        nextState();
     }
 }
 

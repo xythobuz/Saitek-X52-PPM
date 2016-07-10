@@ -10,14 +10,16 @@
  * published by the Free Software Foundation, version 2.
  */
 
-#ifndef __HID_PARSER_H__
-#define __HID_PARSER_H__
+#ifndef __PARSER_H__
+#define __PARSER_H__
 
 #include <hid.h>
-#include "joystick_events.h"
+#include "data.h"
 
 #define RPT_GEMEPAD_LEN 8
 #define BUFFER_SIZE 16
+
+class JoystickEvents;
 
 class JoystickReportParser : public HIDReportParser {
   public:
@@ -34,5 +36,5 @@ class JoystickReportParser : public HIDReportParser {
     JoystickEvents* joyEvents;
 };
 
-#endif // __HID_PARSER_H__
+#endif // __PARSER_H__
 

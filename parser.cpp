@@ -10,7 +10,8 @@
  * published by the Free Software Foundation, version 2.
  */
 
-#include "hid_parser.h"
+#include "events.h"
+#include "parser.h"
 
 //#define DEBUG_OUTPUT
 

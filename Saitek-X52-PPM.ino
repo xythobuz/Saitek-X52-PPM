@@ -14,7 +14,8 @@
 #include <hiduniversal.h>
 #include <usbhub.h>
 
-#include "hid_parser.h"
+#include "events.h"
+#include "parser.h"
 #include "x52.h"
 
 #define ENABLE_SERIAL_PORT
@@ -24,7 +25,8 @@ USB usb;
 USBHub hub(&usb);
 HIDUniversal hid(&usb);
 X52 x52(&usb, &hid);
-JoystickEventsDeadZone joyevents;
+JoystickEventsCPPM joyCPPM;
+JoystickEventsDeadZone joyevents((JoystickEvents*)&joyCPPM);
 JoystickReportParser joy(&joyevents);
 
 void setup() {

@@ -7,30 +7,15 @@
  * published by the Free Software Foundation, version 2.
  */
 
-#ifndef _CPPM_H
-#define _CPPM_H
+#ifndef __CPPM_H__
+#define __CPPM_H__
 
 #include <stdint.h>
 
-#ifdef DEBUG
-
-// Arduino D10
-#define CPPM_PORT PORTB
-#define CPPM_DDR DDRB
-#define CPPM_PIN PB2
-
-#else
-
-#define CPPM_PORT PORTB
-#define CPPM_DDR DDRB
-#define CPPM_PIN PB5
-
-#endif
-
-extern volatile uint16_t cppmData[8];
+#define CPPM_OUTPUT_PIN 13
 
 void cppmInit(void);
 void cppmCopy(uint16_t *data);
 
-#endif
+#endif // __CPPM_H__
 

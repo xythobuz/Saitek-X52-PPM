@@ -13,20 +13,13 @@
 #ifndef __JOYSTICK_EVENTS_H__
 #define __JOYSTICK_EVENTS_H__
 
-class GamePadEventData {
-  public:
-    GamePadEventData(uint16_t v) : X(v), Y(v), Z(v), Rx(v), Ry(v), Rz(v), Slider(v) { }
-    GamePadEventData(uint16_t x, uint16_t y, uint8_t z, uint8_t rx, uint8_t ry,
-            uint16_t rz, uint8_t slider)
-            : X(x), Y(y), Z(z), Rx(rx), Ry(ry), Rz(rz), Slider(slider) { }
+#include <stdint.h>
 
-    uint16_t X, Y, Rz; // 11bit, 11bit, 10bit
-    uint8_t Z, Rx, Ry, Slider;
-};
+class GamePadEventData;
 
 class JoystickEvents {
   public:
-    JoystickEvents(JoystickEvents* _client = NULL) : client(_client) { }
+    JoystickEvents(JoystickEvents* _client = 0) : client(_client) { }
     virtual void OnGamePadChanged(const GamePadEventData& evt) = 0;
     virtual void OnHatSwitch(uint8_t hat) = 0;
     virtual void OnButtonUp(uint8_t but_id) = 0;
@@ -39,18 +32,33 @@ class JoystickEvents {
 
 class JoystickEventsDeadZone : public JoystickEvents {
   public:
+    JoystickEventsDeadZone(JoystickEvents* client = 0) : JoystickEvents(client) { }
     virtual void OnGamePadChanged(const GamePadEventData& evt);
     virtual void OnHatSwitch(uint8_t hat);
     virtual void OnButtonUp(uint8_t but_id);
     virtual void OnButtonDn(uint8_t but_id);
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
-  protected:
+  private:
     const static GamePadEventData deadZone;
     const static uint8_t deadZoneMouseX, deadZoneMouseY;
 
     const static GamePadEventData centerValue;
     const static uint8_t centerMouseX, centerMouseY;
+};
+
+class JoystickEventsCPPM : public JoystickEvents {
+  public:
+    JoystickEventsCPPM(JoystickEvents* client = 0);
+    virtual void OnGamePadChanged(const GamePadEventData& evt);
+    virtual void OnHatSwitch(uint8_t hat);
+    virtual void OnButtonUp(uint8_t but_id);
+    virtual void OnButtonDn(uint8_t but_id);
+    virtual void OnMouseMoved(uint8_t x, uint8_t y);
+
+  private:
+    const static uint8_t channels = 8;
+    uint16_t values[channels];
 };
 
 #endif // __JOYSTICK_EVENTS_H__

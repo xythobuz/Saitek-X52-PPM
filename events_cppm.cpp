@@ -34,7 +34,7 @@ JoystickEventsCPPM::JoystickEventsCPPM(JoystickEvents* client) : JoystickEvents(
 }
 
 void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
-    values[CHANNEL_THROTTLE] = map(evt.Z, 0, 0xFF, 1000, 2000);
+    values[CHANNEL_THROTTLE] = map(evt.Z, 0, 0xFF, 2000, 1000);
     values[CHANNEL_PITCH] = map(evt.Y, 0, 0x7FF, 1000, 2000);
     values[CHANNEL_ROLL] = map(evt.X, 0, 0x7FF, 1000, 2000);
     values[CHANNEL_YAW] = map(evt.Rz, 0, 0x3FF, 1000, 2000);
@@ -60,9 +60,9 @@ void JoystickEventsCPPM::OnButtonUp(uint8_t but_id) {
     }
 }
 
-void JoystickEventsCPPM::OnButtonDn(uint8_t but_id) {
+void JoystickEventsCPPM::OnButtonDown(uint8_t but_id) {
     if (client) {
-        client->OnButtonDn(but_id);
+        client->OnButtonDown(but_id);
     }
 }
 

@@ -99,7 +99,7 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
             uint64_t mask = (1ull << i);
             if ((mask & changes) && joyEvents) {
                 if (buttons & mask) {
-                    joyEvents->OnButtonDn(i);
+                    joyEvents->OnButtonDown(i);
                 } else {
                     joyEvents->OnButtonUp(i);
                 }

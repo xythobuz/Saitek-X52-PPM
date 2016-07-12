@@ -24,7 +24,7 @@ class JoystickEvents {
     virtual void OnGamePadChanged(const GamePadEventData& evt) = 0;
     virtual void OnHatSwitch(uint8_t hat) = 0;
     virtual void OnButtonUp(uint8_t but_id) = 0;
-    virtual void OnButtonDn(uint8_t but_id) = 0;
+    virtual void OnButtonDown(uint8_t but_id) = 0;
     virtual void OnMouseMoved(uint8_t x, uint8_t y) = 0;
 
   protected:
@@ -37,7 +37,7 @@ class JoystickEventsDeadZone : public JoystickEvents {
     virtual void OnGamePadChanged(const GamePadEventData& evt);
     virtual void OnHatSwitch(uint8_t hat);
     virtual void OnButtonUp(uint8_t but_id);
-    virtual void OnButtonDn(uint8_t but_id);
+    virtual void OnButtonDown(uint8_t but_id);
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
@@ -54,7 +54,7 @@ class JoystickEventsCPPM : public JoystickEvents {
     virtual void OnGamePadChanged(const GamePadEventData& evt);
     virtual void OnHatSwitch(uint8_t hat);
     virtual void OnButtonUp(uint8_t but_id);
-    virtual void OnButtonDn(uint8_t but_id);
+    virtual void OnButtonDown(uint8_t but_id);
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
@@ -68,7 +68,7 @@ class JoystickEventsButtons : public JoystickEvents {
     virtual void OnGamePadChanged(const GamePadEventData& evt);
     virtual void OnHatSwitch(uint8_t hat);
     virtual void OnButtonUp(uint8_t but_id);
-    virtual void OnButtonDn(uint8_t but_id);
+    virtual void OnButtonDown(uint8_t but_id);
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:

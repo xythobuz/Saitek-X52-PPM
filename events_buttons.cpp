@@ -17,9 +17,8 @@
 
 #define DEBUG_BUTTON_MFD
 
-JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client) : JoystickEvents(client), x52(x) {
-
-}
+JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client)
+        : JoystickEvents(client), x52(x) { }
 
 void JoystickEventsButtons::OnGamePadChanged(const GamePadEventData& evt) {
     if (client) {
@@ -28,22 +27,28 @@ void JoystickEventsButtons::OnGamePadChanged(const GamePadEventData& evt) {
 }
 
 void JoystickEventsButtons::OnHatSwitch(uint8_t hat) {
+#ifdef DEBUG_BUTTON_MFD
+    String text = "Hat is " + String(hat);
+    x52->setMFDText(1, text.c_str());
+#endif
+
     if (client) {
         client->OnHatSwitch(hat);
     }
 }
 
 void JoystickEventsButtons::OnButtonUp(uint8_t but_id) {
+#ifdef DEBUG_BUTTON_MFD
+    String text = "Button " + String(but_id) + " up";
+    x52->setMFDText(1, text.c_str());
+#endif
+
     if (client) {
         client->OnButtonUp(but_id);
     }
 }
 
-void JoystickEventsButtons::OnButtonDn(uint8_t but_id) {
-    if (client) {
-        client->OnButtonDn(but_id);
-    }
-
+void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
 #ifdef DEBUG_BUTTON_MFD
     String text = "Button " + String(but_id) + " down";
     x52->setMFDText(1, text.c_str());
@@ -58,6 +63,10 @@ void JoystickEventsButtons::OnButtonDn(uint8_t but_id) {
     } else if (but_id == 25) {
         x52->setLEDBrightness(0);
         x52->setMFDBrightness(0);
+    }
+
+    if (client) {
+        client->OnButtonDown(but_id);
     }
 }
 

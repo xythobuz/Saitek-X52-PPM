@@ -19,10 +19,8 @@
 //#define DEBUG_OUTPUT
 
 // X, Y, Z, Rx, Ry, Rz, Slider
-// As you can see, my controller Rz axis is broken,
-// yours may be different, so change these values!
 const GamePadEventData JoystickEventsDeadZone::deadZone(
-    4, 20, 2, 2, 5, 200, 2
+    4, 4, 2, 2, 5, 25, 2
 );
 const uint8_t JoystickEventsDeadZone::deadZoneMouseX = 1;
 const uint8_t JoystickEventsDeadZone::deadZoneMouseY = 1;
@@ -170,14 +168,14 @@ void JoystickEventsDeadZone::OnButtonUp(uint8_t but_id) {
     }
 }
 
-void JoystickEventsDeadZone::OnButtonDn(uint8_t but_id) {
+void JoystickEventsDeadZone::OnButtonDown(uint8_t but_id) {
 #ifdef DEBUG_OUTPUT
     Serial.print("Down: ");
     Serial.println(but_id, DEC);
 #endif
 
     if (client) {
-        client->OnButtonDn(but_id);
+        client->OnButtonDown(but_id);
     }
 }
 

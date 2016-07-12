@@ -19,8 +19,8 @@
 #include "x52.h"
 #include "cppm.h"
 
-//#define ENABLE_SERIAL_PORT
-//#define DEBUG_OUTPUT
+#define ENABLE_SERIAL_PORT
+#define DEBUG_OUTPUT
 //#define DEBUG_INPUT
 
 USB usb;

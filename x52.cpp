@@ -25,6 +25,7 @@ void X52::initialize() {
         return;
     }
 
+    // Get the USB device descriptor so we can check for a valid PID/VID
     uint8_t buf[sizeof (USB_DEVICE_DESCRIPTOR)];
     USB_DEVICE_DESCRIPTOR* udd = reinterpret_cast<USB_DEVICE_DESCRIPTOR*>(buf);
     uint8_t ret = usb->getDevDescr(hid->GetAddress(), 0, sizeof(USB_DEVICE_DESCRIPTOR), (uint8_t*)buf);
@@ -45,7 +46,11 @@ void X52::initialize() {
         Serial.println(pid, DEC);
 #endif
 
-    if ((vid == 1699) && (pid == 597)) {
+    if ((vid == 0x06A3) && (pid == 0x0255)) {
+        // Saitek X52
+        ready = 1;
+    } else if ((vid == 0x06A3) && (pid == 0x0762)) {
+        // Saitek X52 Pro
         ready = 1;
     } else {
 #ifdef DEBUG_OUTPUT
@@ -138,6 +143,10 @@ void X52::setMFDText(uint8_t line, const char* text) {
     };
 
     if (line >= 3) {
+#ifdef DEBUG_OUTPUT
+        Serial.print("Invalid line: ");
+        Serial.println(line, DEC);
+#endif
         return;
     }
 

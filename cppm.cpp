@@ -16,28 +16,22 @@
 
 //#define DEBUG_OUTPUT
 
-#define CHANNELS 8 // set the number of chanels
-#define CHANNEL_DEFAULT_VALUE 1500 // set the default servo value
-#define FRAME_LENGTH 20000 // set the PPM frame length in microseconds (1ms = 1000µs)
-#define PULSE_LENGTH 100 // set the pulse length
-#define ON_STATE 1 // set polarity of the pulses: 1 is positive, 0 is negative
+CPPM* CPPM::inst = NULL;
 
-static volatile uint16_t cppmData[CHANNELS];
-static volatile uint8_t state = 1;
-static volatile uint8_t currentChannel = CHANNELS;
-static volatile uint16_t calcRest = 0;
-
-void cppmInit(void) {
+void CPPM::init(void) {
 #ifdef DEBUG_OUTPUT
     Serial.println("Initializing Timer...");
 #endif
 
-    for (uint8_t i = 0; i < CHANNELS; i++) {
-        cppmData[i] = CHANNEL_DEFAULT_VALUE;
+    state = 1;
+    currentChannel = channels;
+    calcRest = 0;
+    for (uint8_t i = 0; i < channels; i++) {
+        data[i] = CHANNEL_DEFAULT_VALUE;
     }
 
     pinMode(CPPM_OUTPUT_PIN, OUTPUT);
-    digitalWrite(CPPM_OUTPUT_PIN, ON_STATE ? LOW : HIGH);
+    digitalWrite(CPPM_OUTPUT_PIN, CPPM::inst->onState ? LOW : HIGH);
 
     cli();
     TCCR1A = 0; // set entire TCCR1 register to 0
@@ -49,38 +43,42 @@ void cppmInit(void) {
     sei();
 }
 
-void cppmCopy(uint16_t *data) {
+void CPPM::copy(uint16_t* d) {
 #ifdef DEBUG_OUTPUT
     Serial.println("New CPPM data!");
 #endif
 
     cli();
-    for (int i = 0; i < CHANNELS; i++) {
-        cppmData[i] = data[i];
+    for (int i = 0; i < channels; i++) {
+        data[i] = d[i];
     }
     sei();
 }
 
-ISR(TIMER1_COMPA_vect){
+ISR(TIMER1_COMPA_vect) {
+    if (!CPPM::inst) {
+        return;
+    }
+
     TCNT1 = 0;
-    if (state) {
+    if (CPPM::inst->state) {
         // start pulse
-        digitalWrite(CPPM_OUTPUT_PIN, ON_STATE ? HIGH : LOW);
-        OCR1A = PULSE_LENGTH << 1;
-        state = 0;
+        digitalWrite(CPPM_OUTPUT_PIN, CPPM::inst->onState ? HIGH : LOW);
+        OCR1A = CPPM::inst->pulseLength << 1;
+        CPPM::inst->state = 0;
     } else {
         // end pulse and calculate when to start the next pulse
-        digitalWrite(CPPM_OUTPUT_PIN, ON_STATE ? LOW : HIGH);
-        state = 1;
-        if (currentChannel >= CHANNELS) {
-            currentChannel = 0;
-            calcRest += PULSE_LENGTH;
-            OCR1A = (FRAME_LENGTH - calcRest) << 1;
-            calcRest = 0;
+        digitalWrite(CPPM_OUTPUT_PIN, CPPM::inst->onState ? LOW : HIGH);
+        CPPM::inst->state = 1;
+        if (CPPM::inst->currentChannel >= CPPM::inst->channels) {
+            CPPM::inst->currentChannel = 0;
+            CPPM::inst->calcRest += CPPM::inst->pulseLength;
+            OCR1A = (CPPM::inst->frameLength - CPPM::inst->calcRest) << 1;
+            CPPM::inst->calcRest = 0;
         } else {
-            OCR1A = (cppmData[currentChannel] - PULSE_LENGTH) << 1;
-            calcRest += cppmData[currentChannel];
-            currentChannel++;
+            OCR1A = (CPPM::inst->data[CPPM::inst->currentChannel] - CPPM::inst->pulseLength) << 1;
+            CPPM::inst->calcRest += CPPM::inst->data[CPPM::inst->currentChannel];
+            CPPM::inst->currentChannel++;
         }
     }
 }

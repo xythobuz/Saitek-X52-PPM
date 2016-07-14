@@ -55,7 +55,7 @@ class X52 {
      * Print text on the MFD lines (0 - 2).
      * Maximum of 16 characters per line.
      */
-    void setMFDText(uint8_t line, const char* text);
+    void setMFDText(uint8_t line, const char* text = "                ");
 
     /*
      * Enable (1) or Disable(0) the MFD shift indicator.

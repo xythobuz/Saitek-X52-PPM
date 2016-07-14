@@ -21,7 +21,7 @@
 
 #define ENABLE_SERIAL_PORT
 #define DEBUG_OUTPUT
-//#define DEBUG_INPUT
+//#define DEBUG_MFD_UPTIME
 
 USB usb;
 USBHub hub(&usb);
@@ -51,14 +51,14 @@ void setup() {
         ErrorMessage<uint8_t >(PSTR("SetReportParser"), 1);
     }
 
-    cppmInit();
+    CPPM::instance().init();
 }
 
 void init_joystick() {
     x52.initialize();
     x52.setMFDText(0, "Arduino X52 Host");
-    x52.setMFDText(1, "  initialized!  ");
-    x52.setMFDText(2, "                ");
+    x52.setMFDText(1, "should be ready!");
+    x52.setMFDText(2, " OK for options ");
 }
 
 void loop() {
@@ -73,47 +73,10 @@ void loop() {
             initialized = 1;
         }
 
+#ifdef DEBUG_MFD_UPTIME
         String text = "Uptime: " + String(millis() / 1000) + "s";
         x52.setMFDText(2, text.c_str());
-    }
-
-#ifdef DEBUG_INPUT
-    if (Serial.available()) {
-        char c = Serial.read();
-        if (c == 't') {
-            x52.setMFDText(0, "Arduino");
-            x52.setMFDText(1, "Hello");
-            x52.setMFDText(2, "World");
-        } else if (c == '0') {
-            x52.setMFDBrightness(0);
-        } else if (c == '1') {
-            x52.setMFDBrightness(1);
-        } else if (c == '2') {
-            x52.setMFDBrightness(2);
-        } else if (c == '3') {
-            x52.setLEDBrightness(0);
-        } else if (c == '4') {
-            x52.setLEDBrightness(1);
-        } else if (c == '5') {
-            x52.setLEDBrightness(2);
-        } else if (c == 'q') {
-            x52.setShift(1);
-        } else if (c == 'w') {
-            x52.setShift(0);
-        } else if (c == 'a') {
-            x52.setBlink(1);
-        } else if (c == 's') {
-            x52.setBlink(0);
-        } else if (c == 'z') {
-            x52.setDate(1, 1, 1);
-        } else if (c == 'x') {
-            x52.setTime(12, 42);
-            x52.setTimeOffset(0, -120);
-            x52.setTimeOffset(0, 240);
-        } else {
-            Serial.println("Unknown command!");
-        }
-    }
 #endif
+    }
 }
 

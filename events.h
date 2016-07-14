@@ -58,7 +58,7 @@ class JoystickEventsCPPM : public JoystickEvents {
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
-    const static uint8_t channels = 8;
+    const static uint8_t channels = 12;
     uint16_t values[channels];
 };
 
@@ -72,7 +72,27 @@ class JoystickEventsButtons : public JoystickEvents {
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
+    enum MenuState {
+        NONE = 0,
+        MAINMENU,
+
+        STATES_EDIT,
+        EDIT_CHANNELS,
+        EDIT_FRAME_LENGTH,
+        EDIT_PULSE_LENGTH,
+        EDIT_INVERT,
+
+        STATES_MAX
+    };
+
+    void printMenu();
+    void menuHelper(uint8_t count, const char** menu, const char* title);
+    void printValue(uint16_t min, uint16_t max, const char* title);
+
     X52* x52;
+    MenuState state;
+    uint8_t index;
+    uint16_t value;
 };
 
 #endif // __JOYSTICK_EVENTS_H__

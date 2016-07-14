@@ -30,7 +30,7 @@ JoystickEventsCPPM::JoystickEventsCPPM(JoystickEvents* client) : JoystickEvents(
     values[CHANNEL_AUX1] = 1000;
     values[CHANNEL_AUX2] = 1000;
 
-    cppmCopy(values);
+    CPPM::instance().copy(values);
 }
 
 void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
@@ -41,7 +41,7 @@ void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
     values[CHANNEL_AUX1] = map(evt.Ry, 0, 0xFF, 1000, 2000);
     values[CHANNEL_AUX2] = map(evt.Slider, 0, 0xFF, 1000, 2000);
 
-    cppmCopy(values);
+    CPPM::instance().copy(values);
 
     if (client) {
         client->OnGamePadChanged(evt);

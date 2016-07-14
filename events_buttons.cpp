@@ -16,7 +16,7 @@
 #include "cppm.h"
 #include "events.h"
 
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 //#define DEBUG_BUTTON_MFD
 
 #define MENU_BUTTON_ENTER_1 29
@@ -30,34 +30,6 @@
 
 JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client)
         : JoystickEvents(client), x52(x), state(NONE), index(0), value(0) { }
-
-void JoystickEventsButtons::OnGamePadChanged(const GamePadEventData& evt) {
-    if (client) {
-        client->OnGamePadChanged(evt);
-    }
-}
-
-void JoystickEventsButtons::OnHatSwitch(uint8_t hat) {
-#ifdef DEBUG_BUTTON_MFD
-    String text = "Hat is " + String(hat);
-    x52->setMFDText(1, text.c_str());
-#endif
-
-    if (client) {
-        client->OnHatSwitch(hat);
-    }
-}
-
-void JoystickEventsButtons::OnButtonUp(uint8_t but_id) {
-#ifdef DEBUG_BUTTON_MFD
-    String text = "Button " + String(but_id) + " up";
-    x52->setMFDText(1, text.c_str());
-#endif
-
-    if (client) {
-        client->OnButtonUp(but_id);
-    }
-}
 
 void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const char* title) {
     if (index >= count) {
@@ -211,12 +183,6 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
 
     if (client) {
         client->OnButtonDown(but_id);
-    }
-}
-
-void JoystickEventsButtons::OnMouseMoved(uint8_t x, uint8_t y) {
-    if (client) {
-        client->OnMouseMoved(x, y);
     }
 }
 

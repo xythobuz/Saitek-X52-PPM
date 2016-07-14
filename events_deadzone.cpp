@@ -145,40 +145,6 @@ void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
     }
 }
 
-void JoystickEventsDeadZone::OnHatSwitch(uint8_t hat) {
-#ifdef DEBUG_OUTPUT
-    Serial.print("Hat Switch: ");
-    PrintHex<uint8_t > (hat, 0x80);
-    Serial.println("");
-#endif
-
-    if (client) {
-        client->OnHatSwitch(hat);
-    }
-}
-
-void JoystickEventsDeadZone::OnButtonUp(uint8_t but_id) {
-#ifdef DEBUG_OUTPUT
-    Serial.print("Up: ");
-    Serial.println(but_id, DEC);
-#endif
-
-    if (client) {
-        client->OnButtonUp(but_id);
-    }
-}
-
-void JoystickEventsDeadZone::OnButtonDown(uint8_t but_id) {
-#ifdef DEBUG_OUTPUT
-    Serial.print("Down: ");
-    Serial.println(but_id, DEC);
-#endif
-
-    if (client) {
-        client->OnButtonDown(but_id);
-    }
-}
-
 void JoystickEventsDeadZone::OnMouseMoved(uint8_t x, uint8_t y) {
 #ifdef DEBUG_OUTPUT_RAW
     Serial.print("Mouse X: ");

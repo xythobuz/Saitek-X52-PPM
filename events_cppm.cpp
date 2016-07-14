@@ -48,27 +48,3 @@ void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
     }
 }
 
-void JoystickEventsCPPM::OnHatSwitch(uint8_t hat) {
-    if (client) {
-        client->OnHatSwitch(hat);
-    }
-}
-
-void JoystickEventsCPPM::OnButtonUp(uint8_t but_id) {
-    if (client) {
-        client->OnButtonUp(but_id);
-    }
-}
-
-void JoystickEventsCPPM::OnButtonDown(uint8_t but_id) {
-    if (client) {
-        client->OnButtonDown(but_id);
-    }
-}
-
-void JoystickEventsCPPM::OnMouseMoved(uint8_t x, uint8_t y) {
-    if (client) {
-        client->OnMouseMoved(x, y);
-    }
-}
-

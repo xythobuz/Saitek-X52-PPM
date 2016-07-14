@@ -21,11 +21,11 @@ class X52;
 class JoystickEvents {
   public:
     JoystickEvents(JoystickEvents* _client = 0) : client(_client) { }
-    virtual void OnGamePadChanged(const GamePadEventData& evt) = 0;
-    virtual void OnHatSwitch(uint8_t hat) = 0;
-    virtual void OnButtonUp(uint8_t but_id) = 0;
-    virtual void OnButtonDown(uint8_t but_id) = 0;
-    virtual void OnMouseMoved(uint8_t x, uint8_t y) = 0;
+    virtual void OnGamePadChanged(const GamePadEventData& evt) { if (client) client->OnGamePadChanged(evt); }
+    virtual void OnHatSwitch(uint8_t hat) { if(client) client->OnHatSwitch(hat); }
+    virtual void OnButtonUp(uint8_t but_id) { if(client) client->OnButtonUp(but_id); }
+    virtual void OnButtonDown(uint8_t but_id) { if(client) client->OnButtonDown(but_id); }
+    virtual void OnMouseMoved(uint8_t x, uint8_t y) { if (client) client->OnMouseMoved(x, y); }
 
   protected:
     JoystickEvents* client;
@@ -35,9 +35,6 @@ class JoystickEventsDeadZone : public JoystickEvents {
   public:
     JoystickEventsDeadZone(JoystickEvents* client = 0) : JoystickEvents(client) { }
     virtual void OnGamePadChanged(const GamePadEventData& evt);
-    virtual void OnHatSwitch(uint8_t hat);
-    virtual void OnButtonUp(uint8_t but_id);
-    virtual void OnButtonDown(uint8_t but_id);
     virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
@@ -52,10 +49,6 @@ class JoystickEventsCPPM : public JoystickEvents {
   public:
     JoystickEventsCPPM(JoystickEvents* client = 0);
     virtual void OnGamePadChanged(const GamePadEventData& evt);
-    virtual void OnHatSwitch(uint8_t hat);
-    virtual void OnButtonUp(uint8_t but_id);
-    virtual void OnButtonDown(uint8_t but_id);
-    virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
     const static uint8_t channels = 12;
@@ -65,11 +58,7 @@ class JoystickEventsCPPM : public JoystickEvents {
 class JoystickEventsButtons : public JoystickEvents {
   public:
     JoystickEventsButtons(X52* x = 0, JoystickEvents* client = 0);
-    virtual void OnGamePadChanged(const GamePadEventData& evt);
-    virtual void OnHatSwitch(uint8_t hat);
-    virtual void OnButtonUp(uint8_t but_id);
     virtual void OnButtonDown(uint8_t but_id);
-    virtual void OnMouseMoved(uint8_t x, uint8_t y);
 
   private:
     enum MenuState {

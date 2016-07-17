@@ -18,6 +18,7 @@
 #include "parser.h"
 #include "x52.h"
 #include "cppm.h"
+#include "frsky.h"
 
 #define ENABLE_SERIAL_PORT
 #define DEBUG_OUTPUT
@@ -31,6 +32,7 @@ JoystickEventsCPPM joyCPPM;
 JoystickEventsButtons joyButtons(&x52, (JoystickEvents*)&joyCPPM);
 JoystickEventsDeadZone joyevents((JoystickEvents*)&joyButtons);
 JoystickReportParser joy(&joyevents);
+FrSky frsky(&Serial);
 
 void setup() {
 #ifdef ENABLE_SERIAL_PORT
@@ -63,6 +65,7 @@ void init_joystick() {
 
 void loop() {
     usb.Task();
+    frsky.poll();
 
     static unsigned long lastTime = 0;
     static uint8_t initialized = 0;

@@ -29,7 +29,7 @@
 #define MODE_BUTTON_RED 25
 
 JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client)
-        : JoystickEvents(client), x52(x), state(NONE), index(0), value(0) { }
+        : JoystickEvents(client), x52(x), state(NONE), index(0), value(0), menuTime(0) { }
 
 void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const char* title) {
     if (index >= count) {
@@ -40,19 +40,23 @@ void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const c
     if (index > 1) {
         start = index - 1;
     }
+
     uint8_t end = start + 2;
     if (index == 0) {
         x52->setMFDText(0, title);
         line = 1;
         end = start + 1;
     }
+
     if (end >= count) {
         end = count - 1;
     }
+
     for (uint8_t i = start; i <= end; i++) {
         String tmp = (index == i) ? "-> " : "   ";
         x52->setMFDText(line++, (tmp + menu[i]).c_str());
     }
+
     if (line == 2) {
         x52->setMFDText(2);
     }
@@ -71,13 +75,37 @@ void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const c
 
 void JoystickEventsButtons::printMenu() {
     static const char* mainMenu[] = {
-        "Channels", "Frame Length",
-        "Pulse Length", "Invert"
+        "Status", "Trim Axis", "Trim Endpoint", "Invert Axis", "CPPM Config"
     };
     static const uint8_t mainMenuCount = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
+    static const char* cppmMenu[] = {
+        "Channels", "Frame Length", "Pulse Length", "Invert", "Main Menu"
+    };
+    static const uint8_t cppmMenuCount = sizeof(cppmMenu) / sizeof(cppmMenu[0]);
+
+    static const char* axisMenu[] = {
+        "Roll", "Pitch", "Yaw", "Throttle", "Aux1", "Aux2", "Main Menu"
+    };
+    static const uint8_t axisMenuCount = sizeof(axisMenu) / sizeof(axisMenu[0]);
+
+    static const char* endpointMenu[] = {
+        "Roll Min", "Roll Max", "Pitch Min", "Pitch Max", "Yaw Min", "Yaw Max",
+        "Throttle Min", "Throttle Max", "Aux1 Min", "Aux1 Max", "Aux2 Min",
+        "Aux2 Max", "Main Menu"
+    };
+    static const uint8_t endpointMenuCount = sizeof(endpointMenu) / sizeof(endpointMenu[0]);
+
     if (state == MAINMENU) {
         menuHelper(mainMenuCount, mainMenu, "Main Menu");
+    } else if (state == CPPMMENU) {
+        menuHelper(cppmMenuCount, cppmMenu, "CPPM Config Menu");
+    } else if (state == TRIMAXISMENU) {
+        menuHelper(axisMenuCount, axisMenu, "Trim Axis Menu");
+    } else if (state == TRIMENDPOINTMENU) {
+        menuHelper(endpointMenuCount, endpointMenu, "Trim Endpoints");
+    } else if (state == INVERTAXISMENU) {
+        menuHelper(axisMenuCount, axisMenu, "Invert Axis Menu");
     } else if (state == EDIT_CHANNELS) {
         printValue(4, CHANNELS_MAX, mainMenu[0]);
     } else if (state == EDIT_FRAME_LENGTH) {
@@ -87,6 +115,8 @@ void JoystickEventsButtons::printMenu() {
     } else if (state == EDIT_INVERT) {
         printValue(0, 1, mainMenu[3]);
     }
+
+    menuTime = millis();
 }
 
 void JoystickEventsButtons::printValue(uint16_t min, uint16_t max, const char* title) {
@@ -131,7 +161,63 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
     } else if ((but_id == MENU_BUTTON_ENTER_1) || (but_id == MENU_BUTTON_ENTER_2)) {
         if (state == NONE) {
             state = MAINMENU;
+            index = 0;
         } else if (state == MAINMENU) {
+            if (index == 0) {
+                state = NONE;
+            } else if (index == 1) {
+                //state = TRIMAXISMENU;
+                //index = 0;
+            } else if (index == 2) {
+                //state = TRIMENDPOINTMENU;
+                //index = 0;
+            } else if (index == 3) {
+                //state = INVERTAXISMENU;
+                //index = 0;
+            } else if (index == 4) {
+                state = CPPMMENU;
+                index = 0;
+            }
+        } else if (state == TRIMAXISMENU) {
+            if (index == 0) {
+            } else if (index == 1) {
+            } else if (index == 2) {
+            } else if (index == 3) {
+            } else if (index == 4) {
+            } else if (index == 5) {
+            } else if (index == 6) {
+                state = MAINMENU;
+                index = 0;
+            }
+        } else if (state == TRIMENDPOINTMENU) {
+            if (index == 0) {
+            } else if (index == 1) {
+            } else if (index == 2) {
+            } else if (index == 3) {
+            } else if (index == 4) {
+            } else if (index == 5) {
+            } else if (index == 6) {
+            } else if (index == 7) {
+            } else if (index == 8) {
+            } else if (index == 9) {
+            } else if (index == 10) {
+            } else if (index == 11) {
+            } else if (index == 12) {
+                state = MAINMENU;
+                index = 0;
+            }
+        } else if (state == INVERTAXISMENU) {
+            if (index == 0) {
+            } else if (index == 1) {
+            } else if (index == 2) {
+            } else if (index == 3) {
+            } else if (index == 4) {
+            } else if (index == 5) {
+            } else if (index == 6) {
+                state = MAINMENU;
+                index = 0;
+            }
+        } else if (state == CPPMMENU) {
             if (index == 0) {
                 state = EDIT_CHANNELS;
                 value = CPPM::instance().getChannels();
@@ -144,6 +230,9 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
             } else if (index == 3) {
                 state = EDIT_INVERT;
                 value = CPPM::instance().getInvert();
+            } else if (index == 4) {
+                state = MAINMENU;
+                index = 0;
             }
         } else if (state == EDIT_CHANNELS) {
             CPPM::instance().setChannels(value);

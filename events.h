@@ -64,6 +64,10 @@ class JoystickEventsButtons : public JoystickEvents {
     enum MenuState {
         NONE = 0,
         MAINMENU,
+        CPPMMENU,
+        TRIMAXISMENU,
+        TRIMENDPOINTMENU,
+        INVERTAXISMENU,
 
         STATES_EDIT,
         EDIT_CHANNELS,
@@ -82,6 +86,7 @@ class JoystickEventsButtons : public JoystickEvents {
     MenuState state;
     uint8_t index;
     uint16_t value;
+    unsigned long menuTime;
 };
 
 #endif // __JOYSTICK_EVENTS_H__

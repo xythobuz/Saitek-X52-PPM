@@ -18,14 +18,23 @@
 //#define DEBUG_OUTPUT_RAW
 //#define DEBUG_OUTPUT
 
-// X, Y, Z, Rx, Ry, Rz, Slider
+/*
+ * Deadzone around the axis center, in both directions.
+ * You can try to counteract a faulty Yaw-Potentiometer
+ * with this, but it won't be enough in extreme cases.
+ * X, Y, Z, Rx, Ry, Rz, Slider
+ */
 const GamePadEventData JoystickEventsDeadZone::deadZone(
     4, 4, 2, 2, 5, 25, 2
 );
 const uint8_t JoystickEventsDeadZone::deadZoneMouseX = 1;
 const uint8_t JoystickEventsDeadZone::deadZoneMouseY = 1;
 
-// X, Y, Z, Rx, Ry, Rz, Slider
+/*
+ * Absolute values of the axis center. Deadzone will be applied
+ * in both directions around these values.
+ * X 11bit, Y 11bit, Z 8bit, Rx 8bit, Ry 8bit, Rz 10bit, Slider 8bit
+ */
 const GamePadEventData JoystickEventsDeadZone::centerValue(
     0x3FF, 0x3FF, 0x7F, 0x7F, 0x7F, 0x1FF, 0x7F
 );
@@ -34,7 +43,7 @@ const uint8_t JoystickEventsDeadZone::centerMouseY = 0x07;
 
 void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
 #ifdef DEBUG_OUTPUT_RAW
-    Serial.print("X: ");
+    Serial.print("Raw X: ");
     PrintHex<uint16_t > (evt.X, 0x80);
     Serial.print(" Y: ");
     PrintHex<uint16_t > (evt.Y, 0x80);
@@ -147,7 +156,7 @@ void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
 
 void JoystickEventsDeadZone::OnMouseMoved(uint8_t x, uint8_t y) {
 #ifdef DEBUG_OUTPUT_RAW
-    Serial.print("Mouse X: ");
+    Serial.print("Raw Mouse X: ");
     PrintHex<uint8_t >(x, 0x80);
     Serial.print("\tY: ");
     PrintHex<uint8_t >(y, 0x80);

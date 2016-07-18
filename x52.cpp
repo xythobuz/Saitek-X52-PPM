@@ -12,7 +12,7 @@
 
 #include "x52.h"
 
-//#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT Serial
 
 #define TIME_24H_FORMAT
 
@@ -31,8 +31,8 @@ void X52::initialize() {
     uint8_t ret = usb->getDevDescr(hid->GetAddress(), 0, sizeof(USB_DEVICE_DESCRIPTOR), (uint8_t*)buf);
     if (ret) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error getting descriptor: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error getting descriptor: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
     }
 
@@ -40,10 +40,10 @@ void X52::initialize() {
     uint16_t pid = udd->idProduct;
 
 #ifdef DEBUG_OUTPUT
-        Serial.print("VID: ");
-        Serial.print(vid, DEC);
-        Serial.print(" PID: ");
-        Serial.println(pid, DEC);
+        DEBUG_OUTPUT.print("VID: ");
+        DEBUG_OUTPUT.print(vid, DEC);
+        DEBUG_OUTPUT.print(" PID: ");
+        DEBUG_OUTPUT.println(pid, DEC);
 #endif
 
     if ((vid == 0x06A3) && (pid == 0x0255)) {
@@ -54,7 +54,7 @@ void X52::initialize() {
         ready = 1;
     } else {
 #ifdef DEBUG_OUTPUT
-        Serial.println("No valid VID/PID found!");
+        DEBUG_OUTPUT.println("No valid VID/PID found!");
 #endif
     }
 }
@@ -67,8 +67,8 @@ void X52::setTime(uint8_t h, uint8_t m) {
             );
     if (ret) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error setting time: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error setting time: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
     }
 }
@@ -96,8 +96,8 @@ void X52::setTimeOffset(uint8_t cl, int16_t offset) {
             );
     if (ret) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error setting offset: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error setting offset: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
     }
 }
@@ -109,8 +109,8 @@ void X52::setDate(uint8_t dd, uint8_t mm, uint8_t yy) {
     }
     if (ret) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error setting date: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error setting date: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
     }
 }
@@ -119,8 +119,8 @@ void X52::setBlink(uint8_t state) {
     uint8_t ret = sendCommand(X52_BLINK_INDICATOR, state ? X52_BLINK_ON : X52_BLINK_OFF);
     if (ret != 0) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error setting blink: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error setting blink: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
     }
 }
@@ -129,8 +129,8 @@ void X52::setShift(uint8_t state) {
     uint8_t ret = sendCommand(X52_SHIFT_INDICATOR, state ? X52_SHIFT_ON : X52_SHIFT_OFF);
     if (ret != 0) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error setting shift: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error setting shift: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
     }
 }
@@ -144,8 +144,8 @@ void X52::setMFDText(uint8_t line, const char* text) {
 
     if (line >= 3) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Invalid line: ");
-        Serial.println(line, DEC);
+        DEBUG_OUTPUT.print("Invalid line: ");
+        DEBUG_OUTPUT.println(line, DEC);
 #endif
         return;
     }
@@ -153,8 +153,8 @@ void X52::setMFDText(uint8_t line, const char* text) {
     uint8_t ret = sendCommand(X52_MFD_CLEAR_LINE | lines[line], 0);
     if (ret) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Error clearing line: ");
-        Serial.println(ret, DEC);
+        DEBUG_OUTPUT.print("Error clearing line: ");
+        DEBUG_OUTPUT.println(ret, DEC);
 #endif
         return;
     }
@@ -173,8 +173,8 @@ void X52::setMFDText(uint8_t line, const char* text) {
         ret = sendCommand(X52_MFD_WRITE_LINE | lines[line], value);
         if (ret) {
 #ifdef DEBUG_OUTPUT
-            Serial.print("Error writing to line: ");
-            Serial.println(ret, DEC);
+            DEBUG_OUTPUT.print("Error writing to line: ");
+            DEBUG_OUTPUT.println(ret, DEC);
 #endif
             return;
         }
@@ -188,14 +188,14 @@ void X52::setMFDText(uint8_t line, const char* text) {
 uint8_t X52::sendCommand(uint16_t command, uint16_t val) {
     if (!ready) {
 #ifdef DEBUG_OUTPUT
-        Serial.println("Invalid state!");
+        DEBUG_OUTPUT.println("Invalid state!");
 #endif
         return 23;
     }
     
     if ((!usb) || (!hid)) {
 #ifdef DEBUG_OUTPUT
-        Serial.println("Invalid objects!");
+        DEBUG_OUTPUT.println("Invalid objects!");
 #endif
         return 42;
     }
@@ -204,7 +204,7 @@ uint8_t X52::sendCommand(uint16_t command, uint16_t val) {
     const uint8_t valHi = (val & 0xFF00) >> 8;
 
 #ifdef DEBUG_OUTPUT
-    Serial.println("Sending X52 Ctrl-Req...");
+    DEBUG_OUTPUT.println("Sending X52 Ctrl-Req...");
 #endif
 
     uint8_t ret = usb->ctrlReq(hid->GetAddress(), 0,
@@ -213,8 +213,8 @@ uint8_t X52::sendCommand(uint16_t command, uint16_t val) {
                               0, 0, NULL, NULL);
     if (ret != 0) {
 #ifdef DEBUG_OUTPUT
-        Serial.print("Ctrl-Req Error Code: ");
-        Serial.println(val, DEC);
+        DEBUG_OUTPUT.print("Ctrl-Req Error Code: ");
+        DEBUG_OUTPUT.println(val, DEC);
 #endif
     }
 

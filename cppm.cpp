@@ -14,13 +14,13 @@
 #include <Arduino.h>
 #include "cppm.h"
 
-//#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT Serial
 
 CPPM* CPPM::inst = NULL;
 
 void CPPM::init(void) {
 #ifdef DEBUG_OUTPUT
-    Serial.println("Initializing Timer...");
+    DEBUG_OUTPUT.println("Initializing Timer...");
 #endif
 
     state = 1;
@@ -45,7 +45,7 @@ void CPPM::init(void) {
 
 void CPPM::copy(uint16_t* d) {
 #ifdef DEBUG_OUTPUT
-    Serial.println("New CPPM data!");
+    DEBUG_OUTPUT.println("New CPPM data!");
 #endif
 
     cli();

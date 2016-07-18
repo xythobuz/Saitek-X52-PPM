@@ -21,7 +21,7 @@
 #include "frsky.h"
 
 #define ENABLE_SERIAL_PORT
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT Serial
 //#define DEBUG_MFD_UPTIME
 
 USB usb;
@@ -40,17 +40,24 @@ void setup() {
 #endif
 
 #ifdef DEBUG_OUTPUT
-    Serial.println("Start");
+    DEBUG_OUTPUT.println("Start");
 #endif
 
+    pinMode(13, OUTPUT);
+    digitalWrite(13, LOW);
+
     if (usb.Init() == -1) {
+        digitalWrite(13, HIGH);
 #ifdef DEBUG_OUTPUT
-        Serial.println("OSC did not start.");
+        DEBUG_OUTPUT.println("OSC did not start.");
 #endif
     }
 
     if (!hid.SetReportParser(0, &joy)) {
-        ErrorMessage<uint8_t >(PSTR("SetReportParser"), 1);
+        digitalWrite(13, HIGH);
+#ifdef DEBUG_OUTPUT
+        DEBUG_OUTPUT.println("Error adding report parser.");
+#endif
     }
 
     CPPM::instance().init();
@@ -61,6 +68,18 @@ void init_joystick() {
     x52.setMFDText(0, "Arduino X52 Host");
     x52.setMFDText(1, "should be ready!");
     x52.setMFDText(2, " OK for options ");
+
+    // Sometimes the first message is lost, so send again
+    if (joyButtons.getCurrentMode() == 1) {
+        x52.setLEDBrightness(2);
+        x52.setMFDBrightness(2);
+    } else if (joyButtons.getCurrentMode() == 2) {
+        x52.setLEDBrightness(1);
+        x52.setMFDBrightness(1);
+    } else if (joyButtons.getCurrentMode() == 3) {
+        x52.setLEDBrightness(0);
+        x52.setMFDBrightness(0);
+    }
 }
 
 void loop() {
@@ -71,9 +90,11 @@ void loop() {
     static uint8_t initialized = 0;
     if ((millis() - lastTime) >= 1000) {
         lastTime = millis();
-        if (!initialized) {
-            init_joystick();
+        if (initialized == 0) {
             initialized = 1;
+        } else if (initialized == 1) {
+            init_joystick();
+            initialized = 2;
         }
 
 #ifdef DEBUG_MFD_UPTIME

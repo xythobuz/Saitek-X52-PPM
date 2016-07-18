@@ -13,7 +13,7 @@
 #include "events.h"
 #include "parser.h"
 
-//#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT Serial
 
 JoystickReportParser::JoystickReportParser(JoystickEvents* evt)
         : joyEvents(evt), oldHat(0), oldButtons(0), oldMouse(0), buffer(0) {
@@ -39,14 +39,14 @@ void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t*
 
 #ifdef DEBUG_OUTPUT
     // Dump whole USB HID packet for debugging purposes
-    Serial.println("");
-    Serial.print("Packet: ");
+    DEBUG_OUTPUT.println("");
+    DEBUG_OUTPUT.print("Packet: ");
     for (uint8_t i = 0; i < (8 + len); i++) {
-        PrintHex<uint8_t >(buf[i], 0x80);
-        Serial.print(" ");
+        DEBUG_OUTPUT.print(buf[i], HEX);
+        DEBUG_OUTPUT.print(" ");
     }
-    Serial.println("");
-    Serial.println("");
+    DEBUG_OUTPUT.println("");
+    DEBUG_OUTPUT.println("");
 #endif
 
     // Checking if there are changes in report since the method was last called

@@ -12,7 +12,7 @@
 
 #include "frsky.h"
 
-#define DEBUG_OUTPUT Serial
+//#define DEBUG_OUTPUT Serial
 
 FrSky::FrSky(Stream* s) : serial(s), dataHandler(0),
         alarmThresholdHandler(0), userDataHandler(0), bufferIndex(0) {

@@ -10,13 +10,11 @@
  * published by the Free Software Foundation, version 2.
  */
 
-#include <usb.h>
-
 #include "data.h"
 #include "events.h"
 
-//#define DEBUG_OUTPUT_RAW
-//#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT_RAW Serial
+//#define DEBUG_OUTPUT Serial
 
 /*
  * Deadzone around the axis center, in both directions.
@@ -43,21 +41,20 @@ const uint8_t JoystickEventsDeadZone::centerMouseY = 0x07;
 
 void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
 #ifdef DEBUG_OUTPUT_RAW
-    Serial.print("Raw X: ");
-    PrintHex<uint16_t > (evt.X, 0x80);
-    Serial.print(" Y: ");
-    PrintHex<uint16_t > (evt.Y, 0x80);
-    Serial.print(" Z: ");
-    PrintHex<uint8_t > (evt.Z, 0x80);
-    Serial.print(" Rx: ");
-    PrintHex<uint8_t > (evt.Rx, 0x80);
-    Serial.print(" Ry: ");
-    PrintHex<uint8_t > (evt.Ry, 0x80);
-    Serial.print(" Rz: ");
-    PrintHex<uint16_t > (evt.Rz, 0x80);
-    Serial.print(" S: ");
-    PrintHex<uint8_t > (evt.Slider, 0x80);
-    Serial.println("");
+    DEBUG_OUTPUT_RAW.print("Raw X: ");
+    DEBUG_OUTPUT_RAW.print(evt.X, HEX);
+    DEBUG_OUTPUT_RAW.print(" Y: ");
+    DEBUG_OUTPUT_RAW.print(evt.Y, HEX);
+    DEBUG_OUTPUT_RAW.print(" Z: ");
+    DEBUG_OUTPUT_RAW.print(evt.Z, HEX);
+    DEBUG_OUTPUT_RAW.print(" Rx: ");
+    DEBUG_OUTPUT_RAW.print(evt.Rx, HEX);
+    DEBUG_OUTPUT_RAW.print(" Ry: ");
+    DEBUG_OUTPUT_RAW.print(evt.Ry, HEX);
+    DEBUG_OUTPUT_RAW.print(" Rz: ");
+    DEBUG_OUTPUT_RAW.print(evt.Rz, HEX);
+    DEBUG_OUTPUT_RAW.print(" S: ");
+    DEBUG_OUTPUT_RAW.println(evt.Slider, HEX);
 #endif
 
     GamePadEventData newData = centerValue;
@@ -131,21 +128,20 @@ void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
 
 #ifdef DEBUG_OUTPUT
     if (updated) {
-        Serial.print("X: ");
-        PrintHex<uint16_t > (newData.X, 0x80);
-        Serial.print(" Y: ");
-        PrintHex<uint16_t > (newData.Y, 0x80);
-        Serial.print(" Z: ");
-        PrintHex<uint8_t > (newData.Z, 0x80);
-        Serial.print(" Rx: ");
-        PrintHex<uint8_t > (newData.Rx, 0x80);
-        Serial.print(" Ry: ");
-        PrintHex<uint8_t > (newData.Ry, 0x80);
-        Serial.print(" Rz: ");
-        PrintHex<uint16_t > (newData.Rz, 0x80);
-        Serial.print(" S: ");
-        PrintHex<uint8_t > (newData.Slider, 0x80);
-        Serial.println("");
+        DEBUG_OUTPUT.print("X: ");
+        DEBUG_OUTPUT.print(newData.X, HEX);
+        DEBUG_OUTPUT.print(" Y: ");
+        DEBUG_OUTPUT.print(newData.Y, HEX);
+        DEBUG_OUTPUT.print(" Z: ");
+        DEBUG_OUTPUT.print(newData.Z, HEX);
+        DEBUG_OUTPUT.print(" Rx: ");
+        DEBUG_OUTPUT.print(newData.Rx, HEX);
+        DEBUG_OUTPUT.print(" Ry: ");
+        DEBUG_OUTPUT.print(newData.Ry, HEX);
+        DEBUG_OUTPUT.print(" Rz: ");
+        DEBUG_OUTPUT.print(newData.Rz, HEX);
+        DEBUG_OUTPUT.print(" S: ");
+        DEBUG_OUTPUT.println(newData.Slider, HEX);
     }
 #endif
 
@@ -156,11 +152,10 @@ void JoystickEventsDeadZone::OnGamePadChanged(const GamePadEventData& evt) {
 
 void JoystickEventsDeadZone::OnMouseMoved(uint8_t x, uint8_t y) {
 #ifdef DEBUG_OUTPUT_RAW
-    Serial.print("Raw Mouse X: ");
-    PrintHex<uint8_t >(x, 0x80);
-    Serial.print("\tY: ");
-    PrintHex<uint8_t >(y, 0x80);
-    Serial.println("");
+    DEBUG_OUTPUT_RAW.print("Raw Mouse X: ");
+    DEBUG_OUTPUT_RAW.print(x, HEX);
+    DEBUG_OUTPUT_RAW.print("\tY: ");
+    DEBUG_OUTPUT_RAW.println(y, HEX);
 #endif
 
     uint8_t newX = centerMouseX;
@@ -190,11 +185,10 @@ void JoystickEventsDeadZone::OnMouseMoved(uint8_t x, uint8_t y) {
 
 #ifdef DEBUG_OUTPUT
     if (updated) {
-        Serial.print("Mouse X: ");
-        PrintHex<uint8_t >(newX, 0x80);
-        Serial.print("\tY: ");
-        PrintHex<uint8_t >(newY, 0x80);
-        Serial.println("");
+        DEBUG_OUTPUT.print("Mouse X: ");
+        DEBUG_OUTPUT.print(newX, HEX);
+        DEBUG_OUTPUT.print("\tY: ");
+        DEBUG_OUTPUT.println(newY, HEX);
     }
 #endif
 

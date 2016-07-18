@@ -16,7 +16,7 @@
 #include "cppm.h"
 #include "events.h"
 
-//#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT Serial
 //#define DEBUG_BUTTON_MFD
 
 #define MENU_BUTTON_ENTER_1 29
@@ -30,7 +30,7 @@
 
 JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client)
         : JoystickEvents(client), x52(x), state(NONE), index(0),
-        value(0), signedValue(0), menuTime(0) { }
+        value(0), signedValue(0), currentMode(0) { }
 
 void JoystickEventsButtons::printMenu() {
     static const char* mainMenu[] = {
@@ -91,8 +91,6 @@ void JoystickEventsButtons::printMenu() {
         uint8_t index = state - EDIT_TRIM_ROLL;
         printSignedValue(-100, 100, (String("Trim ") + axisMenu[index]).c_str());
     }
-
-    menuTime = millis();
 }
 
 void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
@@ -104,12 +102,15 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
     if (but_id == MODE_BUTTON_GREEN) {
         x52->setLEDBrightness(2);
         x52->setMFDBrightness(2);
+        currentMode = 1;
     } else if (but_id == MODE_BUTTON_YELLOW) {
         x52->setLEDBrightness(1);
         x52->setMFDBrightness(1);
+        currentMode = 2;
     } else if (but_id == MODE_BUTTON_RED) {
         x52->setLEDBrightness(0);
         x52->setMFDBrightness(0);
+        currentMode = 3;
     } else if ((but_id == MENU_BUTTON_ENTER_1) || (but_id == MENU_BUTTON_ENTER_2)) {
         if (state == NONE) {
             state = MAINMENU;
@@ -387,27 +388,27 @@ void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const c
     }
 
 #ifdef DEBUG_OUTPUT
-    Serial.print("menuHelper() state=");
-    Serial.print(state);
-    Serial.print(" index=");
-    Serial.print(index);
-    Serial.print(" start=");
-    Serial.print(start);
-    Serial.print(" end=");
-    Serial.println(end);
+    DEBUG_OUTPUT.print("menuHelper() state=");
+    DEBUG_OUTPUT.print(state);
+    DEBUG_OUTPUT.print(" index=");
+    DEBUG_OUTPUT.print(index);
+    DEBUG_OUTPUT.print(" start=");
+    DEBUG_OUTPUT.print(start);
+    DEBUG_OUTPUT.print(" end=");
+    DEBUG_OUTPUT.println(end);
 #endif
 }
 
 void JoystickEventsButtons::printValue(uint16_t min, uint16_t max, const char* title) {
 #ifdef DEBUG_OUTPUT
-    Serial.print("printValue() state=");
-    Serial.print(state);
-    Serial.print(" index=");
-    Serial.print(index);
-    Serial.print(" min=");
-    Serial.print(min);
-    Serial.print(" max=");
-    Serial.println(max);
+    DEBUG_OUTPUT.print("printValue() state=");
+    DEBUG_OUTPUT.print(state);
+    DEBUG_OUTPUT.print(" index=");
+    DEBUG_OUTPUT.print(index);
+    DEBUG_OUTPUT.print(" min=");
+    DEBUG_OUTPUT.print(min);
+    DEBUG_OUTPUT.print(" max=");
+    DEBUG_OUTPUT.println(max);
 #endif
 
     if (value < min) {
@@ -424,14 +425,14 @@ void JoystickEventsButtons::printValue(uint16_t min, uint16_t max, const char* t
 
 void JoystickEventsButtons::printSignedValue(int16_t min, int16_t max, const char* title) {
 #ifdef DEBUG_OUTPUT
-    Serial.print("printSignedValue() state=");
-    Serial.print(state);
-    Serial.print(" index=");
-    Serial.print(index);
-    Serial.print(" min=");
-    Serial.print(min);
-    Serial.print(" max=");
-    Serial.println(max);
+    DEBUG_OUTPUT.print("printSignedValue() state=");
+    DEBUG_OUTPUT.print(state);
+    DEBUG_OUTPUT.print(" index=");
+    DEBUG_OUTPUT.print(index);
+    DEBUG_OUTPUT.print(" min=");
+    DEBUG_OUTPUT.print(min);
+    DEBUG_OUTPUT.print(" max=");
+    DEBUG_OUTPUT.println(max);
 #endif
 
     if (signedValue < min) {

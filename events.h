@@ -110,6 +110,8 @@ class JoystickEventsButtons : public JoystickEvents {
     JoystickEventsButtons(X52* x = 0, JoystickEvents* client = 0);
     virtual void OnButtonDown(uint8_t but_id);
 
+    uint8_t getCurrentMode() { return currentMode; }
+
   private:
     enum MenuState {
         NONE = 0,
@@ -164,7 +166,7 @@ class JoystickEventsButtons : public JoystickEvents {
     uint8_t index;
     uint16_t value;
     int16_t signedValue;
-    unsigned long menuTime;
+    uint8_t currentMode;
 };
 
 extern JoystickEventsCPPM joyCPPM;

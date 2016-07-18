@@ -45,14 +45,64 @@ class JoystickEventsDeadZone : public JoystickEvents {
     const static uint8_t centerMouseX, centerMouseY;
 };
 
+#define CHANNEL_ROLL 0
+#define CHANNEL_PITCH 1
+#define CHANNEL_THROTTLE 2
+#define CHANNEL_YAW 3
+#define CHANNEL_AUX1 4
+#define CHANNEL_AUX2 5
+
 class JoystickEventsCPPM : public JoystickEvents {
   public:
     JoystickEventsCPPM(JoystickEvents* client = 0);
     virtual void OnGamePadChanged(const GamePadEventData& evt);
 
+    uint8_t getInvert(uint8_t ch) {
+        if (ch < channels) return invert[ch];
+        else return 0;
+    }
+
+    void setInvert(uint8_t ch, uint8_t i) {
+        if (ch < channels) invert[ch] = i;
+    }
+
+    uint16_t getMinimum(uint8_t ch) {
+        if (ch < channels) return minimum[ch];
+        else return 0;
+    }
+
+    void setMinimum(uint8_t ch, uint16_t i) {
+        if (ch < channels) minimum[ch] = i;
+    }
+
+    uint16_t getMaximum(uint8_t ch) {
+        if (ch < channels) return maximum[ch];
+        else return 0;
+    }
+
+    void setMaximum(uint8_t ch, uint16_t i) {
+        if (ch < channels) maximum[ch] = i;
+    }
+
+    int16_t getTrim(uint8_t ch) {
+        if (ch < channels) return trim[ch];
+        else return 0;
+    }
+
+    void setTrim(uint8_t ch, int16_t i) {
+        if (ch < channels) trim[ch] = i;
+    }
+
   private:
+    uint16_t getJoystickAxis(const GamePadEventData& evt, uint8_t ch);
+    uint16_t getJoystickMax(uint8_t ch);
+
     const static uint8_t channels = 12;
     uint16_t values[channels];
+    uint8_t invert[channels];
+    uint16_t minimum[channels];
+    uint16_t maximum[channels];
+    int16_t trim[channels];
 };
 
 class JoystickEventsButtons : public JoystickEvents {
@@ -74,6 +124,32 @@ class JoystickEventsButtons : public JoystickEvents {
         EDIT_FRAME_LENGTH,
         EDIT_PULSE_LENGTH,
         EDIT_INVERT,
+        EDIT_MIN_ROLL,
+        EDIT_MAX_ROLL,
+        EDIT_MIN_PITCH,
+        EDIT_MAX_PITCH,
+        EDIT_MIN_YAW,
+        EDIT_MAX_YAW,
+        EDIT_MIN_THROTTLE,
+        EDIT_MAX_THROTTLE,
+        EDIT_MIN_AUX1,
+        EDIT_MAX_AUX1,
+        EDIT_MIN_AUX2,
+        EDIT_MAX_AUX2,
+        EDIT_INVERT_ROLL,
+        EDIT_INVERT_PITCH,
+        EDIT_INVERT_YAW,
+        EDIT_INVERT_THROTTLE,
+        EDIT_INVERT_AUX1,
+        EDIT_INVERT_AUX2,
+
+        STATES_EDIT_SIGNED,
+        EDIT_TRIM_ROLL,
+        EDIT_TRIM_PITCH,
+        EDIT_TRIM_YAW,
+        EDIT_TRIM_THROTTLE,
+        EDIT_TRIM_AUX1,
+        EDIT_TRIM_AUX2,
 
         STATES_MAX
     };
@@ -81,13 +157,19 @@ class JoystickEventsButtons : public JoystickEvents {
     void printMenu();
     void menuHelper(uint8_t count, const char** menu, const char* title);
     void printValue(uint16_t min, uint16_t max, const char* title);
+    void printSignedValue(int16_t min, int16_t max, const char* title);
 
     X52* x52;
     MenuState state;
     uint8_t index;
     uint16_t value;
+    int16_t signedValue;
     unsigned long menuTime;
 };
+
+extern JoystickEventsCPPM joyCPPM;
+extern JoystickEventsButtons joyButtons;
+extern JoystickEventsDeadZone joyDeadZone;
 
 #endif // __JOYSTICK_EVENTS_H__
 

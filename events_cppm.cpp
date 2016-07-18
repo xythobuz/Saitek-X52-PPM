@@ -15,37 +15,73 @@
 #include "cppm.h"
 #include "events.h"
 
-#define CHANNEL_ROLL 0
-#define CHANNEL_PITCH 1
-#define CHANNEL_THROTTLE 2
-#define CHANNEL_YAW 3
-#define CHANNEL_AUX1 4
-#define CHANNEL_AUX2 5
-
 JoystickEventsCPPM::JoystickEventsCPPM(JoystickEvents* client) : JoystickEvents(client) {
     for (uint8_t i = 0; i < channels; i++) {
         values[i] = 1500;
+        invert[i] = 0;
+        minimum[i] = 1000;
+        maximum[i] = 2000;
+        trim[i] = 0;
     }
 
     values[CHANNEL_AUX1] = 1000;
     values[CHANNEL_AUX2] = 1000;
+    invert[CHANNEL_THROTTLE] = 1;
 
     CPPM::instance().copy(values);
 }
 
 void JoystickEventsCPPM::OnGamePadChanged(const GamePadEventData& evt) {
-    values[CHANNEL_ROLL] = map(evt.X, 0, 0x7FF, 1000, 2000);
-    values[CHANNEL_PITCH] = map(evt.Y, 0, 0x7FF, 1000, 2000);
-    values[CHANNEL_THROTTLE] = map(evt.Z, 0, 0xFF, 2000, 1000);
-    values[CHANNEL_YAW] = map(evt.Rz, 0, 0x3FF, 1000, 2000);
-    values[CHANNEL_AUX1] = map(evt.Ry, 0, 0xFF, 1000, 2000);
-    values[CHANNEL_AUX2] = map(evt.Slider, 0, 0xFF, 1000, 2000);
-    values[CHANNEL_AUX2 + 1] = map(evt.Rx, 0, 0xFF, 1000, 2000);
+    for (uint8_t i = 0; i < (CHANNEL_AUX2 + 1); i++) {
+        uint16_t value = ((int32_t)getJoystickAxis(evt, i)) + trim[i];
+        values[i] = map(value, 0, getJoystickMax(i),
+                invert[i] ? maximum[i] : minimum[i], invert[i] ? minimum[i] : maximum[i]);
+    }
 
     CPPM::instance().copy(values);
 
     if (client) {
         client->OnGamePadChanged(evt);
+    }
+}
+
+uint16_t JoystickEventsCPPM::getJoystickAxis(const GamePadEventData& evt, uint8_t ch) {
+    if (ch == CHANNEL_ROLL) {
+        return evt.X;
+    } else if (ch == CHANNEL_PITCH) {
+        return evt.Y;
+    } else if (ch == CHANNEL_THROTTLE) {
+        return evt.Z;
+    } else if (ch == CHANNEL_YAW) {
+        return evt.Rz;
+    } else if (ch == CHANNEL_AUX1) {
+        return evt.Ry;
+    } else if (ch == CHANNEL_AUX2) {
+        return evt.Slider;
+    } else if (ch == (CHANNEL_AUX2 + 1)) {
+        return evt.Rx;
+    } else {
+        return 0;
+    }
+}
+
+uint16_t JoystickEventsCPPM::getJoystickMax(uint8_t ch) {
+    if (ch == CHANNEL_ROLL) {
+        return 0x7FF;
+    } else if (ch == CHANNEL_PITCH) {
+        return 0x7FF;
+    } else if (ch == CHANNEL_THROTTLE) {
+        return 0xFF;
+    } else if (ch == CHANNEL_YAW) {
+        return 0x3FF;
+    } else if (ch == CHANNEL_AUX1) {
+        return 0xFF;
+    } else if (ch == CHANNEL_AUX2) {
+        return 0xFF;
+    } else if (ch == (CHANNEL_AUX2 + 1)) {
+        return 0xFF;
+    } else {
+        return 0xFF;
     }
 }
 

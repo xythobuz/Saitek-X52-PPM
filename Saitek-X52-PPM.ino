@@ -30,8 +30,8 @@ HIDUniversal hid(&usb);
 X52 x52(&usb, &hid);
 JoystickEventsCPPM joyCPPM;
 JoystickEventsButtons joyButtons(&x52, (JoystickEvents*)&joyCPPM);
-JoystickEventsDeadZone joyevents((JoystickEvents*)&joyButtons);
-JoystickReportParser joy(&joyevents);
+JoystickEventsDeadZone joyDeadZone((JoystickEvents*)&joyButtons);
+JoystickReportParser joy(&joyDeadZone);
 FrSky frsky(&Serial);
 
 void setup() {

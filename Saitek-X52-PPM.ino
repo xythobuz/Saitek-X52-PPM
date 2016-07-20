@@ -13,6 +13,7 @@
 #include <hid.h>
 #include <hiduniversal.h>
 #include <usbhub.h>
+#include <avr/wdt.h>
 
 #include "events.h"
 #include "parser.h"
@@ -33,6 +34,33 @@ JoystickEventsButtons joyButtons(&x52, (JoystickEvents*)&joyCPPM);
 JoystickEventsDeadZone joyDeadZone((JoystickEvents*)&joyButtons);
 JoystickReportParser joy(&joyDeadZone);
 FrSky frsky(&Serial);
+
+static void stringHelper(String& a, String& b, char delim, uint8_t line) {
+    String s = a + delim;
+    for (uint8_t i = 0; i < (14 - a.length() - b.length()); i++) {
+        s += ' ';
+    }
+    s += b + delim;
+    x52.setMFDText(line, s.c_str());
+}
+
+void statusCallback(uint8_t a1, uint8_t a2, uint8_t q1, uint8_t q2) {
+    x52.setMFDText(0, "Telemetry Status");
+
+    uint16_t l1 = q1 * 100 / 255, l2 = q2 * 100 / 255;
+    String link1(l1), link2(l2);
+    stringHelper(link1, link2, '%', 1);
+
+    uint32_t v1 = a1 * 330 / 255;
+    uint32_t v1hundred = v1 / 100;
+    uint32_t v1ten = v1 % 100;
+    String volt1 = String(v1hundred) + '.' + (v1ten);
+    uint32_t v2 = a2 * 330 / 255;
+    uint32_t v2hundred = v2 / 100;
+    uint32_t v2ten = v2 % 100;
+    String volt2 = String(v2hundred) + '.' + (v2ten);
+    stringHelper(volt1, volt2, 'V', 2);
+}
 
 void setup() {
 #ifdef ENABLE_SERIAL_PORT
@@ -61,13 +89,13 @@ void setup() {
     }
 
     CPPM::instance().init();
+    frsky.setDataHandler(&statusCallback);
+    wdt_enable(WDTO_500MS);
 }
 
 void init_joystick() {
     x52.initialize();
-    x52.setMFDText(0, "Arduino X52 Host");
-    x52.setMFDText(1, "should be ready!");
-    x52.setMFDText(2, " OK for options ");
+    statusCallback(0, 0, 0, 0);
 
     // Sometimes the first message is lost, so send again
     if (joyButtons.getCurrentMode() == 1) {
@@ -83,6 +111,7 @@ void init_joystick() {
 }
 
 void loop() {
+    wdt_reset();
     usb.Task();
     frsky.poll();
 

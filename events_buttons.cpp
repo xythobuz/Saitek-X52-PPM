@@ -28,6 +28,8 @@
 #define MODE_BUTTON_YELLOW 24
 #define MODE_BUTTON_RED 25
 
+void statusCallback(uint8_t a1, uint8_t a2, uint8_t q1, uint8_t q2);
+
 JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client)
         : JoystickEvents(client), x52(x), state(NONE), index(0),
         value(0), signedValue(0), currentMode(0) { }
@@ -56,9 +58,7 @@ void JoystickEventsButtons::printMenu() {
     static const uint8_t endpointMenuCount = sizeof(endpointMenu) / sizeof(endpointMenu[0]);
 
     if (state == NONE) {
-        x52->setMFDText(0, "Telemetry Status");
-        x52->setMFDText(1, "???%        ???%");
-        x52->setMFDText(2, "??.?V      ??.?V");
+        statusCallback(0, 0, 0, 0);
     } else if (state == MAINMENU) {
         menuHelper(mainMenuCount, mainMenu, "Main Menu");
     } else if (state == CPPMMENU) {

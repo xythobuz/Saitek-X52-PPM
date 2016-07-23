@@ -88,5 +88,7 @@ class X52 {
     uint8_t ready;
 };
 
+extern X52 x52;
+
 #endif // __X52_H__
 

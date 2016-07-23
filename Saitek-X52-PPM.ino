@@ -30,7 +30,7 @@ USBHub hub(&usb);
 HIDUniversal hid(&usb);
 X52 x52(&usb, &hid);
 JoystickEventsCPPM joyCPPM;
-JoystickEventsButtons joyButtons(&x52, (JoystickEvents*)&joyCPPM);
+JoystickEventsButtons joyButtons((JoystickEvents*)&joyCPPM);
 JoystickEventsDeadZone joyDeadZone((JoystickEvents*)&joyButtons);
 JoystickReportParser joy(&joyDeadZone);
 FrSky frsky(&Serial);

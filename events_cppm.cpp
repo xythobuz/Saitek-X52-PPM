@@ -24,9 +24,30 @@ JoystickEventsCPPM::JoystickEventsCPPM(JoystickEvents* client) : JoystickEvents(
         trim[i] = 0;
     }
 
+    /*
+     * Aux switches are commonly used for arming.
+     * Ensure we're not sending high values when
+     * no joystick has been connected...
+     */
     values[CHANNEL_AUX1] = 1000;
     values[CHANNEL_AUX2] = 1000;
+
+    /*
+     * Default values to match my personal setup.
+     * Can be changed using the on-screen menu.
+     */
     invert[CHANNEL_THROTTLE] = 1;
+    invert[CHANNEL_PITCH] = 1;
+    minimum[CHANNEL_THROTTLE] = 1010;
+    maximum[CHANNEL_THROTTLE] = 1950;
+    minimum[CHANNEL_ROLL] = 1050;
+    maximum[CHANNEL_ROLL] = 1950;
+    minimum[CHANNEL_PITCH] = 1080;
+    maximum[CHANNEL_PITCH] = 1890;
+    minimum[CHANNEL_AUX1] = 990;
+    maximum[CHANNEL_AUX1] = 2100;
+    minimum[CHANNEL_AUX2] = 990;
+    maximum[CHANNEL_AUX2] = 1990;
 
     CPPM::instance().copy(values);
 }

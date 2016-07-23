@@ -16,7 +16,15 @@
 #include <stdint.h>
 
 class GamePadEventData;
-class X52;
+
+enum RxChannels {
+    CHANNEL_ROLL = 0,
+    CHANNEL_PITCH = 1,
+    CHANNEL_THROTTLE = 2,
+    CHANNEL_YAW = 3,
+    CHANNEL_AUX1 = 4,
+    CHANNEL_AUX2 = 5
+};
 
 class JoystickEvents {
   public:
@@ -44,13 +52,6 @@ class JoystickEventsDeadZone : public JoystickEvents {
     const static GamePadEventData centerValue;
     const static uint8_t centerMouseX, centerMouseY;
 };
-
-#define CHANNEL_ROLL 0
-#define CHANNEL_PITCH 1
-#define CHANNEL_THROTTLE 2
-#define CHANNEL_YAW 3
-#define CHANNEL_AUX1 4
-#define CHANNEL_AUX2 5
 
 class JoystickEventsCPPM : public JoystickEvents {
   public:
@@ -107,7 +108,7 @@ class JoystickEventsCPPM : public JoystickEvents {
 
 class JoystickEventsButtons : public JoystickEvents {
   public:
-    JoystickEventsButtons(X52* x = 0, JoystickEvents* client = 0);
+    JoystickEventsButtons(JoystickEvents* client = 0);
     virtual void OnButtonDown(uint8_t but_id);
 
     uint8_t getCurrentMode() { return currentMode; }
@@ -161,7 +162,6 @@ class JoystickEventsButtons : public JoystickEvents {
     void printValue(uint16_t min, uint16_t max, const char* title);
     void printSignedValue(int16_t min, int16_t max, const char* title);
 
-    X52* x52;
     MenuState state;
     uint8_t index;
     uint16_t value;

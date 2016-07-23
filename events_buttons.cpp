@@ -28,10 +28,21 @@
 #define MODE_BUTTON_YELLOW 24
 #define MODE_BUTTON_RED 25
 
+#define MIN_FRAME_LENGTH 10000
+#define MAX_FRAME_LENGTH 30000
+#define MIN_PULSE_LENGTH 100
+#define MAX_PULSE_LENGTH 1000
+#define MIN_LOW_ENDPOINT 500
+#define MAX_LOW_ENDPOINT 1500
+#define MIN_HIGH_ENDPOINT 1500
+#define MAX_HIGH_ENDPOINT 2500
+#define MIN_TRIM -100
+#define MAX_TRIM 100
+
 void statusCallback(uint8_t a1, uint8_t a2, uint8_t q1, uint8_t q2);
 
-JoystickEventsButtons::JoystickEventsButtons(X52* x, JoystickEvents* client)
-        : JoystickEvents(client), x52(x), state(NONE), index(0),
+JoystickEventsButtons::JoystickEventsButtons(JoystickEvents* client)
+        : JoystickEvents(client), state(NONE), index(0),
         value(0), signedValue(0), currentMode(0) { }
 
 void JoystickEventsButtons::printMenu() {
@@ -72,9 +83,9 @@ void JoystickEventsButtons::printMenu() {
     } else if (state == EDIT_CHANNELS) {
         printValue(4, CHANNELS_MAX, cppmMenu[0]);
     } else if (state == EDIT_FRAME_LENGTH) {
-        printValue(10000, 30000, cppmMenu[1]);
+        printValue(MIN_FRAME_LENGTH, MAX_FRAME_LENGTH, cppmMenu[1]);
     } else if (state == EDIT_PULSE_LENGTH) {
-        printValue(100, 1000, cppmMenu[2]);
+        printValue(MIN_PULSE_LENGTH, MAX_PULSE_LENGTH, cppmMenu[2]);
     } else if (state == EDIT_INVERT) {
         printValue(0, 1, cppmMenu[3]);
     } else if ((state >= EDIT_INVERT_ROLL) && (state <= EDIT_INVERT_AUX2)) {
@@ -83,33 +94,33 @@ void JoystickEventsButtons::printMenu() {
     } else if ((state >= EDIT_MIN_ROLL) && (state <= EDIT_MAX_AUX2)) {
         uint8_t index = state - EDIT_MIN_ROLL;
         if (index & 0x01) {
-            printValue(1500, 2500, endpointMenu[index]);
+            printValue(MIN_HIGH_ENDPOINT, MAX_HIGH_ENDPOINT, endpointMenu[index]);
         } else {
-            printValue(500, 1500, endpointMenu[index]);
+            printValue(MIN_LOW_ENDPOINT, MAX_LOW_ENDPOINT, endpointMenu[index]);
         }
     } else if ((state >= EDIT_TRIM_ROLL) && (state <= EDIT_TRIM_AUX2)) {
         uint8_t index = state - EDIT_TRIM_ROLL;
-        printSignedValue(-100, 100, (String("Trim ") + axisMenu[index]).c_str());
+        printSignedValue(MIN_TRIM, MAX_TRIM, (String("Trim ") + axisMenu[index]).c_str());
     }
 }
 
 void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
 #ifdef DEBUG_BUTTON_MFD
     String text = "Button " + String(but_id) + " down";
-    x52->setMFDText(1, text.c_str());
+    x52.setMFDText(1, text.c_str());
 #endif
 
     if (but_id == MODE_BUTTON_GREEN) {
-        x52->setLEDBrightness(2);
-        x52->setMFDBrightness(2);
+        x52.setLEDBrightness(2);
+        x52.setMFDBrightness(2);
         currentMode = 1;
     } else if (but_id == MODE_BUTTON_YELLOW) {
-        x52->setLEDBrightness(1);
-        x52->setMFDBrightness(1);
+        x52.setLEDBrightness(1);
+        x52.setMFDBrightness(1);
         currentMode = 2;
     } else if (but_id == MODE_BUTTON_RED) {
-        x52->setLEDBrightness(0);
-        x52->setMFDBrightness(0);
+        x52.setLEDBrightness(0);
+        x52.setMFDBrightness(0);
         currentMode = 3;
     } else if ((but_id == MENU_BUTTON_ENTER_1) || (but_id == MENU_BUTTON_ENTER_2)) {
         if (state == NONE) {
@@ -369,7 +380,7 @@ void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const c
 
     uint8_t end = start + 2;
     if (index == 0) {
-        x52->setMFDText(0, title);
+        x52.setMFDText(0, title);
         line = 1;
         end = start + 1;
     }
@@ -380,11 +391,11 @@ void JoystickEventsButtons::menuHelper(uint8_t count, const char** menu, const c
 
     for (uint8_t i = start; i <= end; i++) {
         String tmp = (index == i) ? "-> " : "   ";
-        x52->setMFDText(line++, (tmp + menu[i]).c_str());
+        x52.setMFDText(line++, (tmp + menu[i]).c_str());
     }
 
     if (line == 2) {
-        x52->setMFDText(2);
+        x52.setMFDText(2);
     }
 
 #ifdef DEBUG_OUTPUT
@@ -418,9 +429,9 @@ void JoystickEventsButtons::printValue(uint16_t min, uint16_t max, const char* t
         value = max;
     }
 
-    x52->setMFDText(0, (String(title) + ":").c_str());
-    x52->setMFDText(1, String(value).c_str());
-    x52->setMFDText(2, "Press OK to save");
+    x52.setMFDText(0, (String(title) + ":").c_str());
+    x52.setMFDText(1, String(value).c_str());
+    x52.setMFDText(2, "Press OK to save");
 }
 
 void JoystickEventsButtons::printSignedValue(int16_t min, int16_t max, const char* title) {
@@ -442,8 +453,8 @@ void JoystickEventsButtons::printSignedValue(int16_t min, int16_t max, const cha
         signedValue = max;
     }
 
-    x52->setMFDText(0, (String(title) + ":").c_str());
-    x52->setMFDText(1, String(signedValue).c_str());
-    x52->setMFDText(2, "Press OK to save");
+    x52.setMFDText(0, (String(title) + ":").c_str());
+    x52.setMFDText(1, String(signedValue).c_str());
+    x52.setMFDText(2, "Press OK to save");
 }
 

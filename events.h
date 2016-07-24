@@ -14,17 +14,9 @@
 #define __JOYSTICK_EVENTS_H__
 
 #include <stdint.h>
+#include "config.h"
 
 class GamePadEventData;
-
-enum RxChannels {
-    CHANNEL_ROLL = 0,
-    CHANNEL_PITCH = 1,
-    CHANNEL_THROTTLE = 2,
-    CHANNEL_YAW = 3,
-    CHANNEL_AUX1 = 4,
-    CHANNEL_AUX2 = 5
-};
 
 class JoystickEvents {
   public:
@@ -59,51 +51,50 @@ class JoystickEventsCPPM : public JoystickEvents {
     virtual void OnGamePadChanged(const GamePadEventData& evt);
 
     uint8_t getInvert(uint8_t ch) {
-        if (ch < channels) return invert[ch];
+        if (ch < CHANNELS_MAX) return invert[ch];
         else return 0;
     }
 
     void setInvert(uint8_t ch, uint8_t i) {
-        if (ch < channels) invert[ch] = i;
+        if (ch < CHANNELS_MAX) invert[ch] = i;
     }
 
     uint16_t getMinimum(uint8_t ch) {
-        if (ch < channels) return minimum[ch];
+        if (ch < CHANNELS_MAX) return minimum[ch];
         else return 0;
     }
 
     void setMinimum(uint8_t ch, uint16_t i) {
-        if (ch < channels) minimum[ch] = i;
+        if (ch < CHANNELS_MAX) minimum[ch] = i;
     }
 
     uint16_t getMaximum(uint8_t ch) {
-        if (ch < channels) return maximum[ch];
+        if (ch < CHANNELS_MAX) return maximum[ch];
         else return 0;
     }
 
     void setMaximum(uint8_t ch, uint16_t i) {
-        if (ch < channels) maximum[ch] = i;
+        if (ch < CHANNELS_MAX) maximum[ch] = i;
     }
 
     int16_t getTrim(uint8_t ch) {
-        if (ch < channels) return trim[ch];
+        if (ch < CHANNELS_MAX) return trim[ch];
         else return 0;
     }
 
     void setTrim(uint8_t ch, int16_t i) {
-        if (ch < channels) trim[ch] = i;
+        if (ch < CHANNELS_MAX) trim[ch] = i;
     }
 
   private:
     uint16_t getJoystickAxis(const GamePadEventData& evt, uint8_t ch);
     uint16_t getJoystickMax(uint8_t ch);
 
-    const static uint8_t channels = 12;
-    uint16_t values[channels];
-    uint8_t invert[channels];
-    uint16_t minimum[channels];
-    uint16_t maximum[channels];
-    int16_t trim[channels];
+    uint16_t values[CHANNELS_MAX];
+    uint8_t invert[CHANNELS_MAX];
+    uint16_t minimum[CHANNELS_MAX];
+    uint16_t maximum[CHANNELS_MAX];
+    int16_t trim[CHANNELS_MAX];
 };
 
 class JoystickEventsButtons : public JoystickEvents {

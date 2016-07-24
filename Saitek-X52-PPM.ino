@@ -20,6 +20,7 @@
 #include "x52.h"
 #include "cppm.h"
 #include "frsky.h"
+#include "config.h"
 
 #define ENABLE_SERIAL_PORT
 //#define DEBUG_OUTPUT Serial
@@ -73,6 +74,8 @@ void setup() {
 
     pinMode(13, OUTPUT);
     digitalWrite(13, LOW);
+
+    eepromRead();
 
     if (usb.Init() == -1) {
         digitalWrite(13, HIGH);

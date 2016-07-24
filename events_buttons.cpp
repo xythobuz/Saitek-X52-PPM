@@ -15,6 +15,7 @@
 #include "x52.h"
 #include "cppm.h"
 #include "events.h"
+#include "config.h"
 
 //#define DEBUG_OUTPUT Serial
 //#define DEBUG_BUTTON_MFD
@@ -47,7 +48,8 @@ JoystickEventsButtons::JoystickEventsButtons(JoystickEvents* client)
 
 void JoystickEventsButtons::printMenu() {
     static const char* mainMenu[] = {
-        "Status", "Trim Axis", "Trim Endpoint", "Invert Axis", "CPPM Config"
+        "Status", "Trim Axis", "Trim Endpoint", "Invert Axis", "CPPM Config",
+        "Save EEPROM", "Load EEPROM"
     };
     static const uint8_t mainMenuCount = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
@@ -140,6 +142,12 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
                 index = 0;
             } else if (index == 4) {
                 state = CPPMMENU;
+                index = 0;
+            } else if (index == 5) {
+                eepromWrite();
+                index = 0;
+            } else if (index == 6) {
+                eepromRead();
                 index = 0;
             }
         } else if (state == TRIMAXISMENU) {

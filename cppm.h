@@ -12,10 +12,7 @@
 
 #include <stdint.h>
 #include <avr/interrupt.h>
-
-#define CPPM_OUTPUT_PIN 4
-#define CHANNEL_DEFAULT_VALUE 1500
-#define CHANNELS_MAX 12
+#include "config.h"
 
 ISR(TIMER1_COMPA_vect);
 
@@ -48,7 +45,8 @@ class CPPM {
     inline void setInvert(uint8_t i) { onState = !i; }
 
   private:
-    CPPM() : channels(6), frameLength(20000), pulseLength(300), onState(1) { }
+    CPPM() : channels(DEFAULT_CHANNELS), frameLength(DEFAULT_FRAME_LENGTH),
+            pulseLength(DEFAULT_PULSE_LENGTH), onState(!DEFAULT_INVERT_STATE) { }
     CPPM(CPPM&) { }
 
     volatile uint16_t channels;

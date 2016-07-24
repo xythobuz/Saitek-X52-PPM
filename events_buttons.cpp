@@ -54,7 +54,7 @@ void JoystickEventsButtons::printMenu() {
     static const uint8_t mainMenuCount = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
     static const char* cppmMenu[] = {
-        "Channels", "Frame Length", "Pulse Length", "Invert", "Main Menu"
+        "Channels", "Frame Length", "Pulse Length", "Invert", "Output Pin", "Main Menu"
     };
     static const uint8_t cppmMenuCount = sizeof(cppmMenu) / sizeof(cppmMenu[0]);
 
@@ -90,6 +90,8 @@ void JoystickEventsButtons::printMenu() {
         printValue(MIN_PULSE_LENGTH, MAX_PULSE_LENGTH, cppmMenu[2]);
     } else if (state == EDIT_INVERT) {
         printValue(0, 1, cppmMenu[3]);
+    } else if (state == EDIT_CPPM_PIN) {
+        printValue(0, 13, cppmMenu[4]);
     } else if ((state >= EDIT_INVERT_ROLL) && (state <= EDIT_INVERT_AUX2)) {
         uint8_t index = state - EDIT_INVERT_ROLL;
         printValue(0, 1, (String("Invert ") + axisMenu[index]).c_str());
@@ -252,6 +254,9 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
                 state = EDIT_INVERT;
                 value = CPPM::instance().getInvert();
             } else if (index == 4) {
+                state = EDIT_CPPM_PIN;
+                value = CPPM::instance().getOutput();
+            } else if (index == 5) {
                 state = MAINMENU;
                 index = 0;
             }
@@ -266,6 +271,9 @@ void JoystickEventsButtons::OnButtonDown(uint8_t but_id) {
             state = CPPMMENU;
         } else if (state == EDIT_INVERT) {
             CPPM::instance().setInvert(value);
+            state = CPPMMENU;
+        } else if (state == EDIT_CPPM_PIN) {
+            CPPM::instance().setOutput(value);
             state = CPPMMENU;
         } else if (state == EDIT_INVERT_ROLL) {
             joyCPPM.setInvert(CHANNEL_ROLL, value);

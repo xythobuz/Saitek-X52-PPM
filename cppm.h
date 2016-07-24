@@ -44,15 +44,20 @@ class CPPM {
     inline uint8_t getInvert() { return !onState; }
     inline void setInvert(uint8_t i) { onState = !i; }
 
+    inline uint8_t getOutput() { return output; }
+    void setOutput(uint8_t i);
+
   private:
     CPPM() : channels(DEFAULT_CHANNELS), frameLength(DEFAULT_FRAME_LENGTH),
-            pulseLength(DEFAULT_PULSE_LENGTH), onState(!DEFAULT_INVERT_STATE) { }
+            pulseLength(DEFAULT_PULSE_LENGTH), onState(!DEFAULT_INVERT_STATE),
+            output(CPPM_OUTPUT_PIN_DEFAULT) { }
     CPPM(CPPM&) { }
 
     volatile uint16_t channels;
     volatile uint16_t frameLength; // PPM frame length in microseconds (1ms = 1000µs)
     volatile uint16_t pulseLength;
     volatile uint8_t onState; // polarity of the pulses: 1 is positive, 0 is negative
+    volatile uint8_t output;
 
     volatile uint16_t data[CHANNELS_MAX];
     volatile uint8_t state;

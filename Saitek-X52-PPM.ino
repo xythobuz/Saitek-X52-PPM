@@ -22,9 +22,11 @@
 #include "frsky.h"
 #include "config.h"
 
-#define ENABLE_SERIAL_PORT
+#define ENABLE_SERIAL_PORT 9600
 //#define DEBUG_OUTPUT Serial
 //#define DEBUG_MFD_UPTIME
+
+#define LED_STATUS_PIN 13
 
 USB usb;
 USBHub hub(&usb);
@@ -65,27 +67,27 @@ void statusCallback(uint8_t a1, uint8_t a2, uint8_t q1, uint8_t q2) {
 
 void setup() {
 #ifdef ENABLE_SERIAL_PORT
-    Serial.begin(115200);
+    Serial.begin(ENABLE_SERIAL_PORT);
 #endif
 
 #ifdef DEBUG_OUTPUT
     DEBUG_OUTPUT.println("Start");
 #endif
 
-    pinMode(13, OUTPUT);
-    digitalWrite(13, LOW);
+    pinMode(LED_STATUS_PIN, OUTPUT);
+    digitalWrite(LED_STATUS_PIN, LOW);
 
     eepromRead();
 
     if (usb.Init() == -1) {
-        digitalWrite(13, HIGH);
+        digitalWrite(LED_STATUS_PIN, HIGH);
 #ifdef DEBUG_OUTPUT
         DEBUG_OUTPUT.println("OSC did not start.");
 #endif
     }
 
     if (!hid.SetReportParser(0, &joy)) {
-        digitalWrite(13, HIGH);
+        digitalWrite(LED_STATUS_PIN, HIGH);
 #ifdef DEBUG_OUTPUT
         DEBUG_OUTPUT.println("Error adding report parser.");
 #endif
@@ -93,7 +95,7 @@ void setup() {
 
     CPPM::instance().init();
     frsky.setDataHandler(&statusCallback);
-    wdt_enable(WDTO_500MS);
+    wdt_enable(WDTO_1S);
 }
 
 void init_joystick() {

@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-#define CPPM_OUTPUT_PIN 4
+#define CPPM_OUTPUT_PIN_DEFAULT 4
 #define CHANNEL_MINIMUM_VALUE 1000
 #define CHANNEL_DEFAULT_VALUE 1500
 #define CHANNEL_MAXIMUM_VALUE 2000
@@ -32,11 +32,11 @@ enum RxChannels {
 };
 
 // Increase string number when struct changes!
-#define CONFIG_VERSION "USBCPPM-01"
+#define CONFIG_VERSION "USBCPPM-02"
 #define CONFIG_VERSION_LENGTH (sizeof(CONFIG_VERSION) - 1)
 
 struct ConfigData {
-    uint16_t channels, frameLength, pulseLength, inverted;
+    uint16_t channels, frameLength, pulseLength, inverted, cppmPin;
     uint16_t minimum[CHANNELS_MAX];
     uint16_t maximum[CHANNELS_MAX];
     uint16_t invert[CHANNELS_MAX];

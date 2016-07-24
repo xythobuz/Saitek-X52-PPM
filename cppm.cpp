@@ -11,6 +11,7 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, version 2.
  */
+
 #include <Arduino.h>
 #include "cppm.h"
 
@@ -30,8 +31,8 @@ void CPPM::init(void) {
         data[i] = CHANNEL_DEFAULT_VALUE;
     }
 
-    pinMode(CPPM_OUTPUT_PIN, OUTPUT);
-    digitalWrite(CPPM_OUTPUT_PIN, CPPM::inst->onState ? LOW : HIGH);
+    pinMode(output, OUTPUT);
+    digitalWrite(output, CPPM::inst->onState ? LOW : HIGH);
 
     cli();
     TCCR1A = 0; // set entire TCCR1 register to 0
@@ -41,6 +42,14 @@ void CPPM::init(void) {
     TCCR1B |= (1 << CS11); // 8 prescaler: 0,5 microseconds at 16mhz
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
     sei();
+}
+
+void CPPM::setOutput(uint8_t i) {
+    digitalWrite(output, LOW);
+    pinMode(output, INPUT);
+    output = i;
+    pinMode(output, OUTPUT);
+    digitalWrite(output, CPPM::inst->onState ? LOW : HIGH);
 }
 
 void CPPM::copy(uint16_t* d) {
@@ -63,12 +72,12 @@ ISR(TIMER1_COMPA_vect) {
     TCNT1 = 0;
     if (CPPM::inst->state) {
         // start pulse
-        digitalWrite(CPPM_OUTPUT_PIN, CPPM::inst->onState ? HIGH : LOW);
+        digitalWrite(CPPM::inst->output, CPPM::inst->onState ? HIGH : LOW);
         OCR1A = CPPM::inst->pulseLength << 1;
         CPPM::inst->state = 0;
     } else {
         // end pulse and calculate when to start the next pulse
-        digitalWrite(CPPM_OUTPUT_PIN, CPPM::inst->onState ? LOW : HIGH);
+        digitalWrite(CPPM::inst->output, CPPM::inst->onState ? LOW : HIGH);
         CPPM::inst->state = 1;
         if (CPPM::inst->currentChannel >= CPPM::inst->channels) {
             CPPM::inst->currentChannel = 0;

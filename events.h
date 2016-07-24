@@ -118,6 +118,7 @@ class JoystickEventsButtons : public JoystickEvents {
         EDIT_FRAME_LENGTH,
         EDIT_PULSE_LENGTH,
         EDIT_INVERT,
+        EDIT_CPPM_PIN,
         EDIT_MIN_ROLL,
         EDIT_MAX_ROLL,
         EDIT_MIN_PITCH,

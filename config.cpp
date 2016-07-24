@@ -6,6 +6,7 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, version 2.
  */
+
 #include <EEPROM.h>
 #include "cppm.h"
 #include "events.h"
@@ -67,11 +68,13 @@ static uint8_t fromEEPROM(ConfigData& data) {
 
 void eepromRead() {
     ConfigData data;
+
     if (fromEEPROM(data) != 0) {
         data.channels = DEFAULT_CHANNELS;
         data.frameLength = DEFAULT_FRAME_LENGTH;
         data.pulseLength = DEFAULT_PULSE_LENGTH;
         data.inverted = DEFAULT_INVERT_STATE;
+        data.cppmPin = CPPM_OUTPUT_PIN_DEFAULT;
         for (uint8_t i = 0; i < CHANNELS_MAX; i++) {
             data.invert[i] = 0;
             data.minimum[i] = CHANNEL_MINIMUM_VALUE;
@@ -79,12 +82,14 @@ void eepromRead() {
             data.trim[i] = 0;
         }
 
+        // Should be correct for every device
+        data.invert[CHANNEL_THROTTLE] = 1;
+        data.invert[CHANNEL_PITCH] = 1;
+
         /*
          * Default values to match my personal setup.
          * Can be changed using the on-screen menu.
          */
-        data.invert[CHANNEL_THROTTLE] = 1;
-        data.invert[CHANNEL_PITCH] = 1;
         data.minimum[CHANNEL_THROTTLE] = 1010;
         data.maximum[CHANNEL_THROTTLE] = 1950;
         data.minimum[CHANNEL_ROLL] = 1050;
@@ -103,6 +108,7 @@ void eepromRead() {
     CPPM::instance().setFrameLength(data.frameLength);
     CPPM::instance().setPulseLength(data.pulseLength);
     CPPM::instance().setInvert(data.inverted);
+    CPPM::instance().setOutput(data.cppmPin);
     for (uint8_t i = 0; i < CHANNELS_MAX; i++) {
         joyCPPM.setInvert(i, data.invert[i]);
         joyCPPM.setMinimum(i, data.minimum[i]);
@@ -113,16 +119,19 @@ void eepromRead() {
 
 void eepromWrite() {
     ConfigData data;
+
     data.channels = CPPM::instance().getChannels();
     data.frameLength = CPPM::instance().getFrameLength();
     data.pulseLength = CPPM::instance().getPulseLength();
     data.inverted = CPPM::instance().getInvert();
+    data.cppmPin = CPPM::instance().getOutput();
     for (uint8_t i = 0; i < CHANNELS_MAX; i++) {
         data.invert[i] = joyCPPM.getInvert(i);
         data.minimum[i] = joyCPPM.getMinimum(i);
         data.maximum[i] = joyCPPM.getMaximum(i);
         data.trim[i] = joyCPPM.getTrim(i);
     }
+
     toEEPROM(data);
 }
 

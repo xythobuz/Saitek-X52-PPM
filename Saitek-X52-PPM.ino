@@ -100,7 +100,10 @@ void setup() {
 
 void init_joystick() {
     x52.initialize();
-    statusCallback(0, 0, 0, 0);
+
+    x52.setMFDText(0, "Arduino X52 Host");
+    x52.setMFDText(1, "Made by xythobuz");
+    x52.setMFDText(2, "Licensed as GPL2");
 
     // Sometimes the first message is lost, so send again
     if (joyButtons.getCurrentMode() == 1) {

@@ -2,6 +2,8 @@
 
 This sketch allows connecting a [Saitek X52](http://www.saitek.com/uk/prod/x52.html) or [Saitek X52 Pro](http://www.saitek.com/uk/prod/x52pro.html) to an [Arduino](https://www.arduino.cc/en/Main/ArduinoBoardUno) with a [USB Host Shield](https://www.arduino.cc/en/Main/ArduinoUSBHostShield). It uses the [USB_Host_Shield_2.0 Library](https://github.com/felis/USB_Host_Shield_2.0).
 
+[![Multicopter flight with Saitek X52](http://img.youtube.com/vi/De_Ld6MerNo/0.jpg)](http://www.youtube.com/watch?v=De_Ld6MerNo "Multicopter flight with Saitek X52")
+
 A CPPM signal is generated on a configurable pin and can be fed into a transmitter module or directly into a flight controller.
 
 Using the Multi-Function-Display on the Joystick, every config option can be changed. These values can be stored on the EEPROM and will be loaded on every start.

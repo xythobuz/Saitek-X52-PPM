@@ -32,19 +32,51 @@ void FrSky::poll() {
 
     uint8_t c = serial->read();
     if (c == delimiter) {
-        if (bufferIndex < minPacketSize) {
+#ifdef DEBUG_OUTPUT
+        DEBUG_OUTPUT.print("Got delimiter at ");
+        DEBUG_OUTPUT.println(bufferIndex);
+#endif
+        if (bufferIndex < (minPacketSize - 1)) {
+#ifdef DEBUG_OUTPUT
+            DEBUG_OUTPUT.print("Reset to 0: ");
+            DEBUG_OUTPUT.print(bufferIndex);
+            DEBUG_OUTPUT.print(" ! <= ");
+            DEBUG_OUTPUT.println(minPacketSize - 1);
+#endif
             bufferIndex = 0;
         }
         if (bufferIndex >= bufferSize) {
+#ifdef DEBUG_OUTPUT
+            DEBUG_OUTPUT.print("too large: ");
+            DEBUG_OUTPUT.print(bufferIndex);
+            DEBUG_OUTPUT.print(" / ");
+            DEBUG_OUTPUT.println(bufferSize);
+#endif
             bufferIndex = bufferSize - 1;
         }
         buffer[bufferIndex++] = c;
-        if (bufferIndex > minPacketSize) {
+        if (bufferIndex >= minPacketSize) {
+#ifdef DEBUG_OUTPUT
+            DEBUG_OUTPUT.println("Handling...");
+#endif
             handleMessage();
             bufferIndex = 0;
         }
     } else if ((bufferIndex > 0) && (bufferIndex < bufferSize)) {
         buffer[bufferIndex++] = c;
+#ifdef DEBUG_OUTPUT
+        DEBUG_OUTPUT.print("Got ");
+        DEBUG_OUTPUT.print(c);
+        DEBUG_OUTPUT.print(" at ");
+        DEBUG_OUTPUT.println(bufferIndex - 1);
+#endif
+    } else {
+#ifdef DEBUG_OUTPUT
+        DEBUG_OUTPUT.print("Invalid: ");
+        DEBUG_OUTPUT.print(bufferIndex);
+        DEBUG_OUTPUT.print(" / ");
+        DEBUG_OUTPUT.println(bufferSize);
+#endif
     }
 }
 
@@ -85,6 +117,7 @@ void FrSky::handleMessage() {
     DEBUG_OUTPUT.println("FrSky::handleMessage()");
     for (uint8_t i = 0; i < bufferIndex; i++) {
         DEBUG_OUTPUT.print(buffer[i], HEX);
+        DEBUG_OUTPUT.print(" ");
     }
     DEBUG_OUTPUT.println();
 #endif

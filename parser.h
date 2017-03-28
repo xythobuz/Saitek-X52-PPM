@@ -13,7 +13,7 @@
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
-#include <hid.h>
+#include <usbhid.h>
 #include "data.h"
 
 #define RPT_GEMEPAD_LEN 8
@@ -24,7 +24,7 @@ class JoystickEvents;
 class JoystickReportParser : public HIDReportParser {
   public:
     JoystickReportParser(JoystickEvents* evt);
-    virtual void Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t* bufPart);
+    virtual void Parse(USBHID* hid, bool is_rpt_id, uint8_t len, uint8_t* bufPart);
 
   private:
     uint8_t buf[BUFFER_SIZE];

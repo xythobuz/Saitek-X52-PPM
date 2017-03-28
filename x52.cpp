@@ -16,7 +16,7 @@
 
 #define TIME_24H_FORMAT
 
-X52::X52(USB* u, HID* h) : usb(u), hid(h), ready(0) { }
+X52::X52(USB* u, USBHID* h) : usb(u), hid(h), ready(0) { }
 
 void X52::initialize() {
     ready = 0;

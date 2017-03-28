@@ -10,7 +10,7 @@
  * published by the Free Software Foundation, version 2.
  */
 
-#include <hid.h>
+#include <usbhid.h>
 #include <hiduniversal.h>
 #include <usbhub.h>
 #include <avr/wdt.h>

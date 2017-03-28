@@ -13,7 +13,7 @@
 #ifndef __X52_H__
 #define __X52_H__
 
-#include <hid.h>
+#include <usbhid.h>
 
 #define X52_VENDOR_REQUEST 0x91
 #define X52_MFD_BRIGHTNESS 0xB1
@@ -37,7 +37,7 @@
 
 class X52 {
   public:
-    X52(USB* u, HID* h);
+    X52(USB* u, USBHID* h);
 
     /*
      * Check if a valid PID/VID device has been found.
@@ -84,7 +84,7 @@ class X52 {
     uint8_t sendCommand(uint16_t command, uint16_t val);
     
     USB* usb;
-    HID* hid;
+    USBHID* hid;
     uint8_t ready;
 };
 

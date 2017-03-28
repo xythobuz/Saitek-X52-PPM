@@ -22,7 +22,7 @@ JoystickReportParser::JoystickReportParser(JoystickEvents* evt)
     }
 }
 
-void JoystickReportParser::Parse(HID* hid, bool is_rpt_id, uint8_t len, uint8_t* bufPart) {
+void JoystickReportParser::Parse(USBHID* hid, bool is_rpt_id, uint8_t len, uint8_t* bufPart) {
     // Ugly hack for too small packet size in USB Host library...
     if (len == 8) {
         // First part of buffer, store and do nothing
